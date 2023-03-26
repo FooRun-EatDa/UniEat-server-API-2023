@@ -1,0 +1,82 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '2.7.9'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'foorun.unieat'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	/* spring boot - framework */
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	/* spring boot - use by gradle */
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+	/* spring boot - webflux */
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	/* spring boot - validation */
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	/* spring boot - security */
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	/* database control */
+	/* jdbc api */
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	/* spring boot - mybatis */
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.0'
+	/* database:java persistence api */
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'com.querydsl:querydsl-jpa:4.4.0'
+	annotationProcessor(
+			"javax.persistence:javax.persistence-api",
+			"javax.annotation:javax.annotation-api",
+			"com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
+	)
+	
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	/* h2 database */
+	runtimeOnly 'com.h2database:h2'
+	/* mariaDB jdbc library */
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+	/* jsch - ssh session */
+	implementation 'com.jcraft:jsch:0.1.55'
+
+	/* annotation library */
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	/* spring boot - test */
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.mockito:mockito-inline:3.4.0' //Mockito: static method mocking 위해 추가
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
+		}
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+clean {
+	delete file('src/main/generated') // QueryDsl 생성파일 제거
+}

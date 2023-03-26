@@ -1,0 +1,21 @@
+spring:
+  profiles:
+    include:
+    - database
+    - aws
+    active: local
+
+  pid:
+    file: .unieat-api.pid
+
+  application:
+    admin:
+      enabled: false
+
+  mvc:
+    date-format: yyyy-MM-dd
+
+server:
+  shutdown: graceful
+  ssl:
+    enabled: false

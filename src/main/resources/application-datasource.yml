@@ -1,0 +1,29 @@
+spring:
+  session:
+    store-type: jdbc
+
+  datasource:
+    driver-class-name: ${UNIEAT_CLASS_DRIVER}
+    url: ${UNIEAT_DB_URL}
+    username: ${UNIEAT_DB_USERNAME}
+    password: ${UNIEAT_DB_PASSWORD}
+
+  jpa:
+    show_sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        hbm2ddl:
+          auto: validate
+
+mybatis:
+  # xml의 result type에 package명을 생략할 수 있는 alias 설정
+  type-aliases-package: foorun.unieat.api.**.dto
+  # 특정 column 데이터를 내부 데이터로 치환하는 handler 경로
+  type-handlers-package: foorun.unieat.api.config.mybatis.handler
+  # resources의 <mapper> 위치
+  mapper-locations:
+    - classpath*:foorun/unieat/api/**/*.xml
+  configuration-properties:
+    base-namespace: foorun.unieat.api

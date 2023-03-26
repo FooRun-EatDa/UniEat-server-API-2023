@@ -1,0 +1,19 @@
+cloud:
+  aws:
+    s3:
+      bucket: unieat-bucket
+    credentials:
+      access-key: ${FOORUN_AWS_ACCESS_KEY}
+      secret-key: ${FOORUN_AWS_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: DEBUG

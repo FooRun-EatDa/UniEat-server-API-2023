@@ -1,0 +1,28 @@
+spring:
+  session:
+    store-type: jdbc
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/test
+    username: sa
+    password:
+  jpa:
+    show_sql: true
+    generate-ddl: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+        hbm2ddl:
+          auto: create
+
+mybatis:
+  # xml의 result type에 package명을 생략할 수 있는 alias 설정
+  type-aliases-package: foorun.unieat.api.**.dto
+  # 특정 column 데이터를 내부 데이터로 치환하는 handler 경로
+  type-handlers-package: foorun.unieat.api.config.mybatis.handler
+  # resources의 <mapper> 위치
+  mapper-locations:
+    - classpath*:foorun/unieat/api/**/*.xml
+  configuration-properties:
+    base-namespace: foorun.unieat.api

@@ -1,0 +1,27 @@
+spring:
+  applicaion:
+    name: unieat_local
+
+server:
+  port: 8088
+
+foorun:
+  unieat:
+    local:
+      tunnel:
+        ssh:
+          host: ${UNIEAT_AWS_EC2_HOST}
+          username: ${UNIEAT_AWS_EC2_USERNAME}
+          password: ${UNIEAT_AWS_EC2_PASSWORD}
+          port: ${UNIEAT_AWS_EC2_PORT}
+          prvkey: ${UNIEAT_AWS_EC2_PRV_KEY_PATH}
+          lport: 0
+          endpoint: ${UNIEAT_DBS_ENDPOINT}
+          rport: ${UNIEAT_DBS_PORT}
+logging:
+  level:
+    foorun:
+      unieat:
+        api:
+          exclude:
+            local: DEBUG

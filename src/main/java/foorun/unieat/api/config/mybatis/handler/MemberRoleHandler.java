@@ -1,0 +1,32 @@
+package foorun.unieat.api.config.mybatis.handler;
+
+import foorun.unieat.common.rules.MemberRole;
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class MemberRoleHandler extends BaseTypeHandler<MemberRole> {
+    @Override
+    public void setNonNullParameter(PreparedStatement ps, int i, MemberRole parameter, JdbcType jdbcType) throws SQLException {
+        ps.setString(i, parameter.name());
+    }
+
+    @Override
+    public MemberRole getNullableResult(ResultSet rs, String columnName) throws SQLException {
+        return MemberRole.valueOf(rs.getString(columnName));
+    }
+
+    @Override
+    public MemberRole getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+        return MemberRole.indexOf(rs.getInt(columnIndex));
+    }
+
+    @Override
+    public MemberRole getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+        return MemberRole.indexOf(cs.getInt(columnIndex));
+    }
+}
