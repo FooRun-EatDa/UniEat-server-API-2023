@@ -18,13 +18,13 @@ import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 import java.io.Closeable;
 
-@Slf4j
+@Component
 @Profile("local")
-@ToString()
+@Slf4j
+@ToString
 @Validated
 @Getter
 @Setter
-@Component
 @ConfigurationProperties(prefix = "foorun.unieat.local.tunnel.ssh")
 public class SshTunneling implements Closeable {
     private static final JSch jsch;

@@ -1,4 +1,4 @@
-package foorun.unieat.api.model.entity.member;
+package foorun.unieat.api.model.database.member.entity;
 
 import foorun.unieat.api.model.base.jpa.UniEatBaseTimeEntity;
 import foorun.unieat.common.rules.ManagedStatusType;
@@ -43,32 +43,33 @@ public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDeta
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "MEMBER_ID", updatable = false)
+    @Column(name = "member_id", updatable = false)
     private Long pId;
 
     /**
      * 회원 인증 Email
      */
-    @Column(name = "MEMBER_EMAIL", unique = true)
+    @Column(name = "member_email", unique = true)
     @Email(message = "E-Mail 양식이 아닙니다.")
     private String email;
 
     /**
      * 회원 PASSWORD
      */
-    @Column(name = "MEMBER_PASSWORD")
+    @Column(name = "member_password")
     private String password;
 
     /**
      * 최종 로그인 일시
      */
-    @Column(name = "LAST_SIGN_IN_AT")
-    private LocalDateTime lastSignInAt;
+    @Column(name = "last_sign_in_at")
+    @Builder.Default
+    private LocalDateTime lastSignInAt = null;
 
     /**
      * 계정 상태 관리
      */
-    @Column(name = "MANAGE_STATUS", length = 10)
+    @Column(name = "manage_status", length = 10)
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private ManagedStatusType status = ManagedStatusType.ACTIVE;
@@ -76,7 +77,7 @@ public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDeta
     /**
      * 계정 권한 정보
      */
-    @Column(name = "MEMBER_ROLE", length = 10)
+    @Column(name = "member_role", length = 10)
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private MemberRole role = MemberRole.GUEST;
@@ -84,15 +85,16 @@ public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDeta
     /**
      * 계정 잠금 기간
      */
-    @Column(name = "LOCKED_DATE")
-    private LocalDateTime lockedDate;
+    @Column(name = "locked_date")
+    @Builder.Default
+    private LocalDateTime lockedDate = null;
 
     /**
      * 계정 만료 기간
      */
-    @Column(name = "EXPIRED_DATE")
+    @Column(name = "expired_date")
     @Builder.Default
-    private LocalDateTime expiredDate = LocalDateTime.MAX;
+    private LocalDateTime expiredDate = LocalDateTime.of(9999, 12, 31, 23, 59, 59);
 
     /**
      * 비밀번호 변경

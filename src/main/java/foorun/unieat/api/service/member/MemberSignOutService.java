@@ -1,7 +1,7 @@
 package foorun.unieat.api.service.member;
 
 import foorun.unieat.api.model.base.dto.UniEatBaseDTO;
-import foorun.unieat.api.model.domain.response.UniEatCommonResponse;
+import foorun.unieat.api.model.domain.UniEatCommonResponse;
 import foorun.unieat.api.service.UniEatCommonService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

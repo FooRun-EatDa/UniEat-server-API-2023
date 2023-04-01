@@ -33,7 +33,7 @@ dependencies {
 
 	/* database control */
 	/* jdbc api */
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	/*implementation 'org.springframework.boot:spring-boot-starter-jdbc'*/
 	/* spring boot - mybatis */
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.0'
 	/* database:java persistence api */
@@ -47,10 +47,10 @@ dependencies {
 	
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-	/* h2 database */
-	runtimeOnly 'com.h2database:h2'
 	/* mariaDB jdbc library */
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	/* h2 database */
+	runtimeOnly 'com.h2database:h2'
 
 	/* jsch - ssh session */
 	implementation 'com.jcraft:jsch:0.1.55'

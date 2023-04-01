@@ -3,7 +3,6 @@ spring:
     include:
     - database
     - aws
-    - local
 
   pid:
     file: .unieat-api.pid
@@ -11,11 +10,10 @@ spring:
   application:
     admin:
       enabled: false
+    name: unieat
 
   mvc:
     date-format: yyyy-MM-dd
 
 server:
   shutdown: graceful
-  ssl:
-    enabled: false

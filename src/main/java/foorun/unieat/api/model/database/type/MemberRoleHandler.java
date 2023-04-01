@@ -1,4 +1,4 @@
-package foorun.unieat.api.config.mybatis.handler;
+package foorun.unieat.api.model.database.type;
 
 import foorun.unieat.common.rules.MemberRole;
 import org.apache.ibatis.type.BaseTypeHandler;

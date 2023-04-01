@@ -1,12 +1,22 @@
 spring:
   session:
     store-type: jdbc
+
+#spring boot 2.5.x 이상 (*.sql script 실행 옵션)
+  sql:
+    init:
+      mode: always
+
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:~/test
     username: sa
     password:
+#spring boot 2.4.x 이하 (*.sql script 실행 옵션 @deprecated)
+    initialization-mode: always
+
   jpa:
+    open-in-view: false
     show_sql: true
     generate-ddl: true
     properties:
@@ -15,14 +25,16 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         hbm2ddl:
           auto: create
+#*.sql script 실행 순서 옵션
+    defer-datasource-initialization: true
 
 mybatis:
   # xml의 result type에 package명을 생략할 수 있는 alias 설정
-  type-aliases-package: foorun.unieat.api.**.dto
+  type-aliases-package: foorun.unieat.api.model.domain.**
   # 특정 column 데이터를 내부 데이터로 치환하는 handler 경로
-  type-handlers-package: foorun.unieat.api.config.mybatis.handler
+  type-handlers-package: foorun.unieat.api.model.database.type
   # resources의 <mapper> 위치
   mapper-locations:
-    - classpath*:foorun/unieat/api/**/*.xml
+    - classpath*:mappers/**/*.xml
   configuration-properties:
     base-namespace: foorun.unieat.api

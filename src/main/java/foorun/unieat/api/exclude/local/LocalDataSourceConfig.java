@@ -22,11 +22,6 @@ public class LocalDataSourceConfig {
     @Bean("dataSource")
     @Primary
     public DataSource dataSource(DataSourceProperties properties) {
-        log.info(properties.getDriverClassName());
-        log.info(properties.getUrl());
-        log.info(properties.getUsername());
-        log.info(properties.getPassword());
-
         String url = properties.getUrl();
         try {
             int bindPort = tunnel.connectToSSH();
@@ -37,10 +32,10 @@ public class LocalDataSourceConfig {
             log.debug("tunneling database url: {}", url);
         } catch (JSchException e) {
             log.debug("tunneling 실패", e);
-            System.exit(1);
+            throw new RuntimeException();
         } catch (Exception e) {
             log.debug("tunneling 실패", e);
-            System.exit(1);
+            throw new RuntimeException();
         }
 
         return DataSourceBuilder.create()

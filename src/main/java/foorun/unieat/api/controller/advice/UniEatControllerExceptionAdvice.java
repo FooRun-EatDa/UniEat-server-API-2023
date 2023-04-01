@@ -1,6 +1,6 @@
 package foorun.unieat.api.controller.advice;
 
-import foorun.unieat.api.model.domain.response.UniEatCommonResponse;
+import foorun.unieat.api.model.domain.UniEatCommonResponse;
 import foorun.unieat.common.exception.ResponseRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;

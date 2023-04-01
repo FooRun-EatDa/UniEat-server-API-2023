@@ -1,4 +1,4 @@
-package foorun.unieat.api.model.domain.response;
+package foorun.unieat.api.model.domain;
 
 import foorun.unieat.api.model.base.dto.UniEatBaseDTO;
 import foorun.unieat.common.http.FooRunResponseCode;
