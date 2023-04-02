@@ -18,6 +18,11 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	println("profile: ${project.properties['profile']}")
+	activeProfile = project.properties['profile']
+}
+
 dependencies {
 	/* spring boot - framework */
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -52,8 +57,10 @@ dependencies {
 	/* h2 database */
 	runtimeOnly 'com.h2database:h2'
 
-	/* jsch - ssh session */
-	implementation 'com.jcraft:jsch:0.1.55'
+	if ("${activeProfile}" == "local") {
+		/* jsch - ssh session */
+		implementation 'com.jcraft:jsch:0.1.55'
+	}
 
 	/* annotation library */
 	compileOnly 'org.projectlombok:lombok'
@@ -69,14 +76,24 @@ sourceSets {
 	main {
 		java {
 			srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
+			if ("${activeProfile}" != "local") {
+				exclude '**/exclude*'
+			}
 		}
 	}
 }
 
 tasks.named('test') {
+	if ("${activeProfile}" != "local") {
+		exclude '**/exclude*'
+	}
 	useJUnitPlatform()
 }
 
 clean {
 	delete file('src/main/generated') // QueryDsl 생성파일 제거
+}
+
+bootRun {
+	systemProperty("spring.profiles.active", "${activeProfile}")
 }
