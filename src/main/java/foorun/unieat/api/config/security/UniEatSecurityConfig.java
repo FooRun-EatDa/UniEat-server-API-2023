@@ -17,7 +17,7 @@ public class UniEatSecurityConfig {
             .disable()                                          /* 비활성 */
         ;
 
-        http.csrf()                                             /* Crocss Site Request Forgery */
+        http.csrf()                                             /* Cross Site Request Forgery */
             .disable()
         ;
 
