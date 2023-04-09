@@ -1,6 +1,7 @@
 package foorun.unieat.api.controller;
 
 import foorun.unieat.api.model.domain.member.request.MemberSignIn;
+import foorun.unieat.api.model.domain.member.request.MemberSignInByKakao;
 import foorun.unieat.api.model.domain.member.request.MemberSignUp;
 import foorun.unieat.api.service.member.MemberSignInService;
 import foorun.unieat.api.service.member.MemberSignUpService;
@@ -21,8 +22,17 @@ public class MemberController {
     private final MemberSignUpService memberSignUpService;
     private final MemberSignInService memberSignInService;
 
-    @RequestMapping(value = "/sign-in", method = RequestMethod.POST)
+    @Deprecated
+    //@RequestMapping(value = "/sign-in", method = RequestMethod.POST)
     public ResponseEntity signIn(@Validated @RequestBody MemberSignIn form) {
+        log.debug("try sign in: {}", form);
+        ResponseEntity response = memberSignInService.service(form);
+
+        return response;
+    }
+
+    @RequestMapping(value = "/sign-in/kakao", method = RequestMethod.POST)
+    public ResponseEntity signIn(@Validated @RequestBody MemberSignInByKakao form) {
         log.debug("try sign in: {}", form);
         ResponseEntity response = memberSignInService.service(form);
 

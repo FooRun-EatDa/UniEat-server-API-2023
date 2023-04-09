@@ -1,15 +1,19 @@
 package foorun.unieat.api.config.security;
 
+import foorun.unieat.api.service.member.OAuth2DetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @RequiredArgsConstructor
 public class UniEatSecurityConfig {
+    private final OAuth2DetailsService oAuth2DetailsService;
+
     /* http(Hyper Text Transfer Protocol) 설정 */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -19,6 +23,7 @@ public class UniEatSecurityConfig {
 
         http.csrf()                                             /* Cross Site Request Forgery */
             .disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         ;
 
         http.cors()                                             /* Cross-Origin Resource Sharing */
@@ -39,8 +44,17 @@ public class UniEatSecurityConfig {
         ;
 
         http.authorizeHttpRequests()                            /* 요청에 대한 검사 처리 */
-            .antMatchers("/member/sign-*/**")       /* URL 패턴 */
+            .antMatchers("/member/sign-in/**")       /* URL 패턴 */
             .permitAll()                                        /* 인가 */
+            .and()
+            .oauth2Login()
+            .userInfoEndpoint()
+            .userService(oAuth2DetailsService)
+            .and()
+            .redirectionEndpoint().baseUri("/member/sign-in/**")
+            //.and()
+            //.successHandler()
+            //.failureHandler()
         ;
 
         return http.build();

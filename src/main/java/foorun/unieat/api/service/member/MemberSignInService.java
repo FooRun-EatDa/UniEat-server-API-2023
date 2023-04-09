@@ -1,11 +1,14 @@
 package foorun.unieat.api.service.member;
 
+import foorun.unieat.api.auth.JwtProvider;
 import foorun.unieat.api.model.domain.member.request.MemberSignIn;
 import foorun.unieat.api.model.domain.UniEatCommonResponse;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
 import foorun.unieat.api.exception.UniEatForbiddenException;
+import foorun.unieat.api.model.domain.member.request.MemberSignInByKakao;
 import foorun.unieat.api.service.UniEatCommonService;
+import foorun.unieat.common.rules.SocialLoginType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -21,8 +24,10 @@ import org.springframework.util.MultiValueMap;
 @Service
 @RequiredArgsConstructor
 public class MemberSignInService implements UniEatCommonService<MemberSignIn>, UserDetailsService {
+    private final JwtProvider jwtProvider;
     private final UniEatMemberRepository memberRepository;
 
+    @Deprecated
     @Override
     public ResponseEntity service(MemberSignIn form) {
         UniEatMemberEntity member = loadUserByUsername(form.getEmail());
@@ -40,6 +45,14 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn>, U
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.add(HttpHeaders.AUTHORIZATION, "TOKEN");
         headers.add("X-Refresh-Token", "REFRESH_TOKEN");
+        HttpHeaders httpHeaders = HttpHeaders.readOnlyHttpHeaders(headers);
+
+        return UniEatCommonResponse.success(httpHeaders);
+    }
+
+    public ResponseEntity service(MemberSignInByKakao form) {
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add(HttpHeaders.AUTHORIZATION, jwtProvider.createToken(form.getMemberId(), SocialLoginType.KAKAO));
         HttpHeaders httpHeaders = HttpHeaders.readOnlyHttpHeaders(headers);
 
         return UniEatCommonResponse.success(httpHeaders);
