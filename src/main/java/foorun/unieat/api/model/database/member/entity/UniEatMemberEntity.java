@@ -17,11 +17,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,16 +39,8 @@ public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDeta
      * 회원 ID
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id", updatable = false)
-    private Long pId;
-
-    /**
-     * 회원 인증 Email
-     */
-    @Column(name = "member_email", unique = true)
-    @Email(message = "E-Mail 양식이 아닙니다.")
-    private String email;
+    private String primaryId;
 
     /**
      * 회원 PASSWORD
@@ -136,7 +125,7 @@ public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDeta
 
     @Override
     public String getUsername() {
-        return email;
+        return primaryId;
     }
 
     @Override

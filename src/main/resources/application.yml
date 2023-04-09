@@ -3,6 +3,7 @@ spring:
     include:
     - database
     - aws
+    - auth
 
   pid:
     file: .unieat-api.pid
