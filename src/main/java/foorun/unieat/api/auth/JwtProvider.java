@@ -1,6 +1,5 @@
 package foorun.unieat.api.auth;
 
-import foorun.unieat.common.rules.SocialLoginType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,10 +26,8 @@ public class JwtProvider {
         this.tokenExpiryTime = Long.parseLong(strExpSec) * 1000L;
     }
 
-    public String createToken(long memberId, SocialLoginType loginType) {
+    public String createToken(String memberId) {
         Claims claims = Jwts.claims();
-        claims.put("LOGIN_TYPE", loginType.name());
-
         Date now = Calendar.getInstance().getTime();
         return String.format("%s %s", AUTH_TYPE, Jwts.builder()
                 .setClaims(claims)

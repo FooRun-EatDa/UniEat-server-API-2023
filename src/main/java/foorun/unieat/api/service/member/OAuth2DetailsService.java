@@ -1,13 +1,9 @@
 package foorun.unieat.api.service.member;
 
-import foorun.unieat.api.auth.oauth.UniEatAppleOAuth2UserInfo;
-import foorun.unieat.api.auth.oauth.UniEatGoogleOAuth2UserInfo;
-import foorun.unieat.api.auth.oauth.UniEatKakaoOAuth2UserInfo;
-import foorun.unieat.api.auth.oauth.UniEatNaverOAuth2UserInfo;
-import foorun.unieat.api.exception.UniEatBadRequestException;
+import foorun.unieat.api.auth.oauth.UniEatOAuth2User;
+import foorun.unieat.api.exception.UniEatForbiddenException;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
-import foorun.unieat.common.auth.UniEatDefaultOAuth2UserInfo;
 import foorun.unieat.common.rules.SocialLoginType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,42 +26,48 @@ public class OAuth2DetailsService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        UniEatDefaultOAuth2UserInfo userInfo = null;
-        SocialLoginType loginType = SocialLoginType.valueOfIgnoreCase(userRequest.getClientRegistration().getRegistrationId());
+        String username = null;
+        String password = null;
+
+        String provider = userRequest.getClientRegistration().getRegistrationId();
+        SocialLoginType loginType = SocialLoginType.valueOfIgnoreCase(provider);
         switch (loginType) {
-            case APPLE:
-                userInfo = new UniEatAppleOAuth2UserInfo(attributes);
-                break;
+            case APPLE: {
+                username = provider + "_" + attributes.get("");
+                password = null;
+            } break;
 
-            case GOOGLE:
-                userInfo = new UniEatGoogleOAuth2UserInfo(attributes);
-                break;
+            case GOOGLE: {
+                username = provider + "_" + attributes.get("sub");
+                password = null;
+            } break;
 
-            case NAVER:
+            case NAVER: {
                 attributes = (Map) attributes.get("response");
-                userInfo = new UniEatNaverOAuth2UserInfo(attributes);
-                break;
 
-            case KAKAO:
-                userInfo = new UniEatKakaoOAuth2UserInfo(attributes);
-                break;
+                username = provider + "_" + attributes.get("id");
+                password = null;
+            } break;
+
+            case KAKAO: {
+                username = provider + "_" + attributes.get("id");
+                password = null;
+            } break;
 
             default:
-                throw new UniEatBadRequestException();
+                throw new UniEatForbiddenException();
         }
-
-        String username = userInfo.getProvider() + userInfo.getUsername();
-        String password = userInfo.getPassword();
 
         UniEatMemberEntity memberEntity = memberRepository.findById(username).orElse(null);
         if (memberEntity == null) {
             memberEntity = UniEatMemberEntity.builder()
-                    .pId(username)
+                    .primaryId(username)
                     .password(password)
                     .build();
+
             memberRepository.save(memberEntity);
         }
 
-        return oAuth2User;
+        return UniEatOAuth2User.create(memberEntity, attributes);
     }
 }

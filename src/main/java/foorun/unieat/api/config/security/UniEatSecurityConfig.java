@@ -23,7 +23,8 @@ public class UniEatSecurityConfig {
 
         http.csrf()                                             /* Cross Site Request Forgery */
             .disable()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         ;
 
         http.cors()                                             /* Cross-Origin Resource Sharing */
@@ -44,7 +45,7 @@ public class UniEatSecurityConfig {
         ;
 
         http.authorizeHttpRequests()                            /* 요청에 대한 검사 처리 */
-            .antMatchers("/member/sign-in/**")       /* URL 패턴 */
+            .antMatchers("/member/sign-in/**")      /* URL 패턴 */
             .permitAll()                                        /* 인가 */
             .and()
             .oauth2Login()
