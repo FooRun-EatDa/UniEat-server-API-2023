@@ -1,6 +1,6 @@
 package foorun.unieat.api.model.database.member.entity;
 
-import foorun.unieat.api.model.base.jpa.UniEatBaseTimeEntity;
+import foorun.unieat.api.model.base.security.UniEatUserDetails;
 import foorun.unieat.common.rules.ManagedStatusType;
 import foorun.unieat.common.rules.MemberRole;
 import lombok.AccessLevel;
@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Column;
@@ -33,7 +32,7 @@ import java.util.Collections;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
-public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDetails {
+public class UniEatMemberEntity extends UniEatUserDetails {
 
     /**
      * 회원 ID
@@ -112,7 +111,6 @@ public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDeta
         lockedDate = LocalDateTime.of(year, month, day, hour, minute, second);
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
@@ -128,21 +126,25 @@ public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDeta
         return primaryId;
     }
 
+    /* 만료일자 경과 여부 */
     @Override
     public boolean isAccountNonExpired() {
         return LocalDateTime.now().isBefore(expiredDate);
     }
 
+    /* 잠금일자 경과 여부 */
     @Override
     public boolean isAccountNonLocked() {
         return lockedDate == null || LocalDateTime.now().isAfter(lockedDate);
     }
 
+    /* 인증유효 경과 여부 */
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    /* 계정 활성 여부 */
     @Override
     public boolean isEnabled() {
         return status == ManagedStatusType.ACTIVE && isAccountNonExpired() && isAccountNonLocked() && isCredentialsNonExpired();

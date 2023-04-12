@@ -24,13 +24,17 @@ public class MemberController {
     @Deprecated
     @RequestMapping(value = "/sign-in", method = RequestMethod.POST)
     public ResponseEntity signIn(@Validated @RequestBody MemberSignIn form) {
+        /* TODO: oauth 구현할 것 */
+
         log.debug("try sign in: {}", form);
         ResponseEntity response = memberSignInService.service(form);
 
         return response;
     }
 
-    @RequestMapping(value = "/sign-up", method = RequestMethod.POST)
+    /* OAUTH 구현하면서 다르게 처리 */
+    //@RequestMapping(value = "/sign-up", method = RequestMethod.POST)
+    @Deprecated
     public ResponseEntity signUp(@Validated @RequestBody MemberSignUp form) {
         log.debug("try sign up: {}", form);
         ResponseEntity response = memberSignUpService.service(form);

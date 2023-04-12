@@ -7,12 +7,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @RequiredArgsConstructor
 public class UniEatSecurityConfig {
     private final OAuth2DetailsService oAuth2DetailsService;
+
+    /* Spring security Password Encoder */
+    @Bean
+    public PasswordEncoder getPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     /* http(Hyper Text Transfer Protocol) 설정 */
     @Bean
@@ -47,12 +55,12 @@ public class UniEatSecurityConfig {
         http.authorizeHttpRequests()                            /* 요청에 대한 검사 처리 */
             .antMatchers("/member/sign-in/**")      /* URL 패턴 */
             .permitAll()                                        /* 인가 */
-            .and()
-            .oauth2Login()
-            .userInfoEndpoint()
-            .userService(oAuth2DetailsService)
-            .and()
-            .redirectionEndpoint().baseUri("/member/sign-in/**")
+            //.and()
+            //.oauth2Login()
+            //.userInfoEndpoint()
+            //.userService(oAuth2DetailsService)
+            //.and()
+            //.redirectionEndpoint().baseUri("/member/sign-in/**")
             //.and()
             //.successHandler()
             //.failureHandler()

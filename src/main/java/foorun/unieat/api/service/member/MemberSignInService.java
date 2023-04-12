@@ -29,19 +29,15 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn>, U
     @Override
     public ResponseEntity service(MemberSignIn form) {
         UniEatMemberEntity member = loadUserByUsername(form.getPrimaryId());
-        if (false /* todo 비밀번호 확인 조건 */) {
-            throw new UniEatForbiddenException();
-        }
-
         if (!member.isEnabled()) {
             throw new UniEatForbiddenException();
         }
 
         member.updateSignInNow();
 
-        /* todo token 인증 및 생성 구현 */
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add(HttpHeaders.AUTHORIZATION, jwtProvider.createToken(member.getPrimaryId()));
+        headers.add(HttpHeaders.AUTHORIZATION, jwtProvider.createToken(member));
+
         HttpHeaders httpHeaders = HttpHeaders.readOnlyHttpHeaders(headers);
 
         return UniEatCommonResponse.success(httpHeaders);
@@ -50,6 +46,6 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn>, U
     @Override
     @Transactional(readOnly = true)
     public UniEatMemberEntity loadUserByUsername(String username) throws UsernameNotFoundException {
-        return memberRepository.findById(username).orElseThrow(UniEatForbiddenException::new);
+        return memberRepository.findById(username).orElse(null);
     }
 }
