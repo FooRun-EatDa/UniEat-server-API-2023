@@ -1,6 +1,7 @@
 package foorun.unieat.api.model.database.member.entity;
 
 import foorun.unieat.api.model.base.security.UniEatUserDetails;
+import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
 import foorun.unieat.common.rules.ManagedStatusType;
 import foorun.unieat.common.rules.MemberRole;
 import lombok.AccessLevel;
@@ -17,6 +18,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -32,7 +34,14 @@ import java.util.Collections;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
+@IdClass(UniEatMemberId.class)
 public class UniEatMemberEntity extends UniEatUserDetails {
+    /**
+     * 회원 접속경로
+     */
+    @Id
+    @Column(name = "member_provider", updatable = false)
+    private String provider;
 
     /**
      * 회원 ID
@@ -46,12 +55,6 @@ public class UniEatMemberEntity extends UniEatUserDetails {
      */
     @Column(name = "member_password")
     private String password;
-
-    /**
-    * 회원 접속경로
-    */
-    @Column(name = "member_provider")
-    private String provider;
 
     /**
      * 최종 로그인 일시
