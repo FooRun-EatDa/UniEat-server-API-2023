@@ -48,6 +48,12 @@ public class UniEatMemberEntity extends UniEatUserDetails {
     private String password;
 
     /**
+    * 회원 접속경로
+    */
+    @Column(name = "member_provider")
+    private String provider;
+
+    /**
      * 최종 로그인 일시
      */
     @Column(name = "last_sign_in_at")
