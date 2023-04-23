@@ -4,6 +4,7 @@ spring:
     - database
     - aws
     - auth
+    - oauth2
 
   pid:
     file: .unieat-api.pid
