@@ -1,6 +1,7 @@
 package foorun.unieat.api.model.database.member.entity;
 
-import foorun.unieat.api.model.base.jpa.UniEatBaseTimeEntity;
+import foorun.unieat.api.model.base.security.UniEatUserDetails;
+import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
 import foorun.unieat.common.rules.ManagedStatusType;
 import foorun.unieat.common.rules.MemberRole;
 import lombok.AccessLevel;
@@ -10,18 +11,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Email;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,22 +38,21 @@ import java.util.Collections;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
-public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDetails {
+@IdClass(UniEatMemberId.class)
+public class UniEatMemberEntity extends UniEatUserDetails {
+    /**
+     * 회원 접속경로
+     */
+    @Id
+    @Column(name = "member_provider", updatable = false)
+    private String provider;
 
     /**
      * 회원 ID
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id", updatable = false)
-    private Long pId;
-
-    /**
-     * 회원 인증 Email
-     */
-    @Column(name = "member_email", unique = true)
-    @Email(message = "E-Mail 양식이 아닙니다.")
-    private String email;
+    private String primaryId;
 
     /**
      * 회원 PASSWORD
@@ -97,6 +98,17 @@ public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDeta
     private LocalDateTime expiredDate = LocalDateTime.of(9999, 12, 31, 23, 59, 59);
 
     /**
+     * REFRESH TOKEN 발급
+     */
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "member_provider", referencedColumnName = "member_provider"),
+            @JoinColumn(name = "member_id", referencedColumnName = "member_id")
+        }
+    )
+    private UniEatMemberAuthEntity memberAuth;
+
+    /**
      * 비밀번호 변경
      *
      * @param password 변경할 비밀번호
@@ -123,10 +135,9 @@ public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDeta
         lockedDate = LocalDateTime.of(year, month, day, hour, minute, second);
     }
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
@@ -136,24 +147,28 @@ public class UniEatMemberEntity extends UniEatBaseTimeEntity implements UserDeta
 
     @Override
     public String getUsername() {
-        return email;
+        return primaryId;
     }
 
+    /* 만료일자 경과 여부 */
     @Override
     public boolean isAccountNonExpired() {
         return LocalDateTime.now().isBefore(expiredDate);
     }
 
+    /* 잠금일자 경과 여부 */
     @Override
     public boolean isAccountNonLocked() {
         return lockedDate == null || LocalDateTime.now().isAfter(lockedDate);
     }
 
+    /* 인증유효 경과 여부 */
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+    /* 계정 활성 여부 */
     @Override
     public boolean isEnabled() {
         return status == ManagedStatusType.ACTIVE && isAccountNonExpired() && isAccountNonLocked() && isCredentialsNonExpired();

@@ -28,30 +28,12 @@ public class MemberSignUpService implements UniEatCommonService<MemberSignUp> {
             throw new UniEatBadRequestException();
         }
 
-        if (existsEmail(form.getEmail()) || existsNickname(form.getNickname())) {
-            throw new UniEatForbiddenException();
-        }
-
-        /* TODO: 학교 인증 관련 처리 ? */
-
         UniEatMemberEntity newMember = UniEatMemberEntity.builder()
-                .email(form.getEmail())
                 .password(form.getPassword())
                 .build();
 
         memberRepository.save(newMember);
 
         return UniEatCommonResponse.success();
-    }
-
-    @Transactional(readOnly = true)
-    public boolean existsEmail(String email) {
-        return memberRepository.existsByEmail(email);
-    }
-
-    @Transactional(readOnly = true)
-    public boolean existsNickname(String nickname) {
-        /* TODO: 회원 데이터 모델에 별칭 컬럼과 변수 추가할 것 */
-        return false;
     }
 }

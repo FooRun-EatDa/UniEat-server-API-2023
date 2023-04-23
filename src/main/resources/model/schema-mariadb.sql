@@ -1,6 +1,5 @@
 CREATE TABLE IF NOT EXISTS `member_base` (
-   `member_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '회원 고유 ID',
-   `member_email` varchar(255) DEFAULT NULL COMMENT '회원 인증 E-mail',
+   `member_id` varchar(200) NOT NULL AUTO_INCREMENT COMMENT '회원 고유 ID',
    `member_password` varchar(255) DEFAULT NULL COMMENT '회원 비밀번호',
    `last_sign_in_at` datetime DEFAULT NULL COMMENT '최종 로그인 일시',
    `manage_status` varchar(10) DEFAULT NULL COMMENT '계정 상태 관리',

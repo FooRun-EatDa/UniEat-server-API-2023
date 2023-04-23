@@ -1,0 +1,6 @@
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  # 30 minutes
+  expiration-seconds: 1800
+  # 14 days
+  refresh-seconds: 1209600

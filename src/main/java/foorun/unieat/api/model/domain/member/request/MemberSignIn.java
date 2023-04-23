@@ -12,8 +12,7 @@ import javax.validation.constraints.NotBlank;
 @Validated
 public class MemberSignIn implements UniEatBaseDTO {
     @NotBlank
-    @Email(message = "E-Mail 양식이 아닙니다.")
-    private String email;
+    private String primaryId;
 
     @ToString.Exclude
     private String password;
