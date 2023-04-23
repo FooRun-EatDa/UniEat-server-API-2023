@@ -126,7 +126,7 @@ public class UniEatSecurityConfig {
             .and()
             .userInfoEndpoint().userService(oAuth2DetailsService)   /* oauth2 login 성공 이후 설정 */
             .and()
-            .successHandler(new UniEatOauth2AuthenticationSuccessHandler(jwtProvider, authRepository))
+            .successHandler(new UniEatOauth2AuthenticationSuccessHandler(jwtProvider, memberRepository, authRepository))
             .failureHandler(new UniEatOauth2AuthenticationFailureHandler())
         ;
 

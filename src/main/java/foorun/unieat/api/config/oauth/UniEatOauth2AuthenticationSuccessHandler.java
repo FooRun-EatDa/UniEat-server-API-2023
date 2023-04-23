@@ -4,8 +4,10 @@ import foorun.unieat.api.auth.JwtProvider;
 import foorun.unieat.api.exception.UniEatForbiddenException;
 import foorun.unieat.api.exception.UniEatUnAuthorizationException;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberAuthEntity;
+import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
 import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberAuthRepository;
+import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
 import foorun.unieat.common.http.FooRunResponseCode;
 import foorun.unieat.common.http.FooRunToken;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 public class UniEatOauth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtProvider jwtProvider;
 
+    private final UniEatMemberRepository memberRepository;
     private final UniEatMemberAuthRepository authRepository;
 
     @Override
@@ -58,6 +61,10 @@ public class UniEatOauth2AuthenticationSuccessHandler implements AuthenticationS
 
             log.debug("#### ACCESS TOKEN : {}", token.getAccessToken());
             log.debug("#### REFRESH TOKEN: {}", token.getRefreshToken());
+
+            UniEatMemberEntity member = memberRepository.findById(new UniEatMemberId(provider, username)).orElse(UniEatMemberEntity.builder().provider(provider).primaryId(username).build());
+            member.updateSignInNow();
+            memberRepository.save(member);
         } catch (UniEatUnAuthorizationException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, FooRunResponseCode.CODE_401.getResponseMessage());
         } catch (UniEatForbiddenException e) {

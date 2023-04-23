@@ -5,6 +5,7 @@ import foorun.unieat.api.exception.UniEatForbiddenException;
 import foorun.unieat.api.exception.UniEatUnAuthorizationException;
 import foorun.unieat.api.model.base.security.UniEatUserDetails;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberAuthEntity;
+import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
 import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberAuthRepository;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
@@ -65,6 +66,9 @@ public class UniEatJwtAuthentication extends OncePerRequestFilter {
                         response.setHeader(JwtProvider.REFRESH_TOKEN_HEADER_NAME, token.getRefreshToken());
 
                         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities()));
+                        UniEatMemberEntity member = memberRepository.findById(new UniEatMemberId(principal.getProvider(), principal.getUsername())).orElse(UniEatMemberEntity.builder().provider(principal.getProvider()).primaryId(principal.getUsername()).build());
+                        member.updateSignInNow();
+                        memberRepository.save(member);
                     }
                 }
             }
