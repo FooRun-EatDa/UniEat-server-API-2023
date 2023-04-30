@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/* 공통 오류 처리 */
 @RestControllerAdvice(basePackages = "foorun.unieat.api.controller")
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j

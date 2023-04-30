@@ -2,10 +2,12 @@ package foorun.unieat.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import foorun.unieat.api.model.base.dto.UniEatBaseDTO;
 
 public final class JsonUtil {
     private static final JsonMapper mapper;
@@ -27,6 +29,16 @@ public final class JsonUtil {
     public static String asJson(Object obj, boolean pretty) {
         try {
             return pretty ? mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj) : mapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static <T> T ofJson(String json, Class<T> type) {
+        try {
+            return mapper.readValue(json, type);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException(e);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

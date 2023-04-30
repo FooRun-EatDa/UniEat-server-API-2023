@@ -7,7 +7,6 @@ import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
 import foorun.unieat.api.exception.UniEatForbiddenException;
 import foorun.unieat.api.service.UniEatCommonService;
-import foorun.unieat.common.rules.SocialLoginType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -22,13 +21,14 @@ import org.springframework.util.MultiValueMap;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MemberSignInService implements UniEatCommonService<MemberSignIn>, UserDetailsService {
+public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
     private final JwtProvider jwtProvider;
     private final UniEatMemberRepository memberRepository;
 
+    @Deprecated
     @Override
     public ResponseEntity service(MemberSignIn form) {
-        UniEatMemberEntity member = loadUserByUsername(form.getPrimaryId());
+        UniEatMemberEntity member = /*loadUserByUsername(form.getPrimaryId())*/null;
         if (!member.isEnabled()) {
             throw new UniEatForbiddenException();
         }
@@ -36,16 +36,8 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn>, U
         member.updateSignInNow();
 
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add(HttpHeaders.AUTHORIZATION, jwtProvider.createToken(member));
-
         HttpHeaders httpHeaders = HttpHeaders.readOnlyHttpHeaders(headers);
 
         return UniEatCommonResponse.success(httpHeaders);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UniEatMemberEntity loadUserByUsername(String username) throws UsernameNotFoundException {
-        return memberRepository.findById(username).orElse(null);
     }
 }

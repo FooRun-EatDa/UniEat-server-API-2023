@@ -7,6 +7,7 @@ import java.util.Arrays;
 
 @Getter
 public enum SocialLoginType {
+    FOORUN,
     APPLE,
     GOOGLE,
     KAKAO,

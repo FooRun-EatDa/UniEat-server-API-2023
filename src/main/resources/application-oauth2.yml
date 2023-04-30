@@ -15,41 +15,41 @@ spring:
             user-name-attribute: id
 
         registration:
-          apple:
-            client-id:
-            client-name:
-            authorization-grant-type:
-            client-authentication-method:
-            redirect-uri:
-            scope:
-              - gender
-              - age
-              - birthday
+          #apple:
+            #client-id:
+            #client-name:
+            #authorization-grant-type:
+            #client-authentication-method:
+            #redirect-uri:
+            #scope:
+              #- gender
+              #- age
+              #- birthday
 
-          google:
-            client-id:
-            client-secret:
-            redirect-uri: http://localhost:${server.port}/member/sign-in/google
-            scope:
-              - gender
-              - age
-              - birthday
+          #google:
+            #client-id:
+            #client-secret:
+            #redirect-uri:
+            #scope:
+              #- gender
+              #- age
+              #- birthday
 
-          naver:
-            client-name: naver
-            authorization-grant-type: authorization_code
-            client-id:
-            client-secret:
-            redirect-uri: http://localhost:${server.port}/member/sign-in/naver
-            scope:
+          #naver:
+            #client-name: naver
+            #authorization-grant-type:
+            #client-id:
+            #client-secret:
+            #redirect-uri: http://localhost:${server.port}/login/oauth2/code/naver
+            #scope:
 
           kakao:
             client-name: kakao
             client-authentication-method: POST
             authorization-grant-type: authorization_code
             client-id: ${KAKAO_REST_API}
-            client-secret: ${KAKAO_SECRET}
-            redirect-uri: http://localhost:${server.port}/member/sign-in/kakao
+            #client-secret: ${KAKAO_SECRET}
+            redirect-uri: http://localhost:${server.port}/login/oauth2/code/kakao
             scope:
               - gender
               - age_range

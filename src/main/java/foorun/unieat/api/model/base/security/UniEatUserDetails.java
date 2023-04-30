@@ -10,5 +10,6 @@ public abstract class UniEatUserDetails extends UniEatBaseTimeEntity implements 
     public abstract LocalDateTime getExpiredDate();
     public abstract LocalDateTime getLockedDate();
 
+    public abstract String getProvider();
     public abstract ManagedStatusType getStatus();
 }
