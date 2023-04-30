@@ -13,6 +13,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 
+import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -107,6 +109,13 @@ public class UniEatMemberEntity extends UniEatUserDetails {
         }
     )
     private UniEatMemberAuthEntity memberAuth;
+
+    /**
+     * 회원 마이페이지 정보 FK
+     */
+    @OneToOne
+    @JoinColumn(name = "mypage_id")
+    private UniEatMemberMyPageEntity MemberMyPageEntity;
 
     /**
      * 비밀번호 변경

@@ -8,7 +8,9 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+/**
+ * MemberRole(회원 등급 상태) 열거형과 데이터베이스 문자열 형태와의 매핑을 처리함
+ */
 public class MemberRoleHandler extends BaseTypeHandler<MemberRole> {
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, MemberRole parameter, JdbcType jdbcType) throws SQLException {

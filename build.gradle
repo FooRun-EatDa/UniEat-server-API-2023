@@ -40,6 +40,27 @@ dependencies {
 	/* spring boot - security */
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    /* spring boot - email service */
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    /* database control */
+    /* jdbc api */
+    /*implementation 'org.springframework.boot:spring-boot-starter-jdbc'*/
+    /* spring boot - mybatis */
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.0'
+    /* database:java persistence api */
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'com.querydsl:querydsl-jpa:4.4.0'
+
+
+    implementation "javax.persistence:javax.persistence-api"
+    implementation "javax.annotation:javax.annotation-api"
+    implementation "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
+
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	/* authorization library - jwt */
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 
@@ -57,12 +78,13 @@ dependencies {
 	/* database:java persistence api */
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'com.querydsl:querydsl-jpa:4.4.0'
+
 	annotationProcessor(
 			"javax.persistence:javax.persistence-api",
 			"javax.annotation:javax.annotation-api",
 			"com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
 	)
-	
+
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
 	/* mariaDB jdbc library */
@@ -70,10 +92,10 @@ dependencies {
 	/* h2 database */
 	runtimeOnly 'com.h2database:h2'
 
-	if ("${activeProfile}" == "local") {
-		/* jsch - ssh session */
-		implementation 'com.jcraft:jsch:0.1.55'
-	}
+
+    /* jsch - ssh session */
+    implementation 'com.jcraft:jsch:0.1.55'
+
 
 	/* annotation library */
 	compileOnly 'org.projectlombok:lombok'
