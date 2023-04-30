@@ -43,4 +43,12 @@ public final class JsonUtil {
             throw new RuntimeException(e);
         }
     }
+
+    public static String asPrettyJson(Object object) {
+        try {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

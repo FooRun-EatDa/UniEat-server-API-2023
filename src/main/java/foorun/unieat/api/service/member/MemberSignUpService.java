@@ -29,6 +29,7 @@ public class MemberSignUpService implements UniEatCommonService<MemberSignUp> {
         }
 
         UniEatMemberEntity newMember = UniEatMemberEntity.builder()
+                .wait(form.getEmail())
                 .password(form.getPassword())
                 .build();
 
