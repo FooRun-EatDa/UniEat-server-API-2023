@@ -28,8 +28,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Collections;
-
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
@@ -106,7 +104,7 @@ public class UniEatSecurityConfig {
             .and()
 
             .authorizeHttpRequests()                                /* 요청에 대한 검사 처리 */
-            .antMatchers("/member/sign-*")     /* URL 패턴 */
+            .antMatchers("/member/sign-*", "/member/sign-*/*")     /* URL 패턴 */
             .permitAll()                                            /* 인가 */
             .anyRequest()
             .authenticated()

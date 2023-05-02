@@ -127,7 +127,7 @@ public class JwtProvider {
         }
 
         // 계정정보 확인
-        UniEatUserDetails memberInfo = memberRepository.findById(new UniEatMemberId(provider, memberId)).orElseThrow(UniEatUnAuthorizationException::new);
+        UniEatUserDetails memberInfo = memberRepository.findById(UniEatMemberId.of(provider, memberId)).orElseThrow(UniEatUnAuthorizationException::new);
         if (!memberInfo.isEnabled()) {
             throw new UniEatForbiddenException();
         }

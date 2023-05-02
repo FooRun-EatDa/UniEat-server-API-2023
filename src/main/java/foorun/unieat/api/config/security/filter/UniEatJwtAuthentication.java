@@ -57,7 +57,7 @@ public class UniEatJwtAuthentication extends OncePerRequestFilter {
                         }
                         UniEatUserDetails principal = getPrincipal(refreshToken);
                         FooRunToken token = jwtProvider.createToken(principal.getProvider(), principal.getUsername(), principal.getExpiredDate(), principal.getAuthorities().stream().map(e -> e.getAuthority()).collect(Collectors.joining(", ")));
-                        UniEatMemberAuthEntity memberAuth = authRepository.findById(new UniEatMemberId(principal.getProvider(), principal.getUsername())).orElse(UniEatMemberAuthEntity.builder().provider(principal.getProvider()).primaryId(principal.getUsername()).build());
+                        UniEatMemberAuthEntity memberAuth = authRepository.findById(UniEatMemberId.of(principal.getProvider(), principal.getUsername())).orElse(UniEatMemberAuthEntity.builder().provider(principal.getProvider()).primaryId(principal.getUsername()).build());
 
                         memberAuth.setRefreshToken(token.getRefreshToken());
                         authRepository.save(memberAuth);
@@ -66,7 +66,7 @@ public class UniEatJwtAuthentication extends OncePerRequestFilter {
                         response.setHeader(JwtProvider.REFRESH_TOKEN_HEADER_NAME, token.getRefreshToken());
 
                         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities()));
-                        UniEatMemberEntity member = memberRepository.findById(new UniEatMemberId(principal.getProvider(), principal.getUsername())).orElse(UniEatMemberEntity.builder().provider(principal.getProvider()).primaryId(principal.getUsername()).build());
+                        UniEatMemberEntity member = memberRepository.findById(UniEatMemberId.of(principal.getProvider(), principal.getUsername())).orElse(UniEatMemberEntity.builder().provider(principal.getProvider()).primaryId(principal.getUsername()).build());
                         member.updateSignInNow();
                         memberRepository.save(member);
                     }
@@ -83,7 +83,7 @@ public class UniEatJwtAuthentication extends OncePerRequestFilter {
         final String provider = claims.get(JwtProvider.CLAIM_MEMBER_PROVIDER, String.class);
         final String memberId = claims.get(JwtProvider.CLAIM_MEMBER_ID, String.class);
 
-        UniEatUserDetails member = memberRepository.findById(new UniEatMemberId(provider, memberId)).orElseThrow(UniEatUnAuthorizationException::new);
+        UniEatUserDetails member = memberRepository.findById(UniEatMemberId.of(provider, memberId)).orElseThrow(UniEatUnAuthorizationException::new);
         if (!member.isEnabled()) {
             throw new UniEatForbiddenException();
         }
@@ -97,7 +97,7 @@ public class UniEatJwtAuthentication extends OncePerRequestFilter {
         final String provider = claims.get(JwtProvider.CLAIM_MEMBER_PROVIDER, String.class);
         final String memberId = claims.get(JwtProvider.CLAIM_MEMBER_ID, String.class);
 
-        UniEatMemberAuthEntity memberAuth = authRepository.findById(new UniEatMemberId(provider, memberId)).orElseThrow(UniEatUnAuthorizationException::new);
+        UniEatMemberAuthEntity memberAuth = authRepository.findById(UniEatMemberId.of(provider, memberId)).orElseThrow(UniEatUnAuthorizationException::new);
         return token.equals(memberAuth.getRefreshToken());
     }
 }

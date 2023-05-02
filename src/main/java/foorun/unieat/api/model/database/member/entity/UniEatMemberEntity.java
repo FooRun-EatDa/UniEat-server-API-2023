@@ -13,8 +13,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;

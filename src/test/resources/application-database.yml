@@ -26,7 +26,7 @@ spring:
         hbm2ddl:
           auto: create
 #*.sql script 실행 순서 옵션
-    defer-datasource-initialization: true
+    #defer-datasource-initialization: true
 
 mybatis:
   # xml의 result type에 package명을 생략할 수 있는 alias 설정

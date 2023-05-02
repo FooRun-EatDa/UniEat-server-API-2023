@@ -7,7 +7,7 @@ spring:
     - oauth2
 
   pid:
-    file: .unieat-api.pid
+    file: unieat-api.pid
 
   application:
     admin:

@@ -24,11 +24,14 @@ import java.util.Map;
 public class OAuth2DetailsService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final UniEatMemberRepository memberRepository;
 
+    @SuppressWarnings("unchecked")
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         /*OAuth 인증정보 불러오기 */
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
+        log.debug("OAUTH TOKEN TYPE : {}", userRequest.getAccessToken().getTokenType().getValue());
+        log.debug("OAUTH TOKEN VALUE: {}", userRequest.getAccessToken().getTokenValue());
 
         // 공급자 확인 (application-oauth2)
         String provider = userRequest.getClientRegistration().getRegistrationId();
@@ -41,7 +44,7 @@ public class OAuth2DetailsService implements OAuth2UserService<OAuth2UserRequest
         Object gender = null;
 
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
-        SocialLoginType loginType = SocialLoginType.valueOfIgnoreCase(provider);
+        SocialLoginType loginType = SocialLoginType.valueOf(provider.toLowerCase());
         switch (loginType) {
             case FOORUN: {
                 // 자체 로그인?
@@ -93,7 +96,7 @@ public class OAuth2DetailsService implements OAuth2UserService<OAuth2UserRequest
                 throw new UniEatForbiddenException();
         }
 
-        UniEatMemberId findMember = new UniEatMemberId(provider, username);
+        UniEatMemberId findMember = UniEatMemberId.of(provider, username);
         /* Member의 정보 업데이트나 신규 가입처리 TODO: DB model에 연령대, 생일, 성별이 추가되면 update할 것 */
         UniEatMemberEntity memberEntity = memberRepository.findById(findMember)
                 .orElse(UniEatMemberEntity.builder()

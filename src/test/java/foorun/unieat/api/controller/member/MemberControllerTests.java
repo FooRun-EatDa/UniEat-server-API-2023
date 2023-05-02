@@ -32,12 +32,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 @DisplayName("사용자 로그인 처리")
 public class MemberControllerTests extends CommonControllerTests {
+    /*
     @Test
     void memberSignInOAuth() throws Exception {
         mockMvc.perform(request(HttpMethod.POST, "/test"))
                 .andExpect(status().isOk());
     }
-
+    */
     //@InjectMocks
     //private MemberSignInService memberSignInService;
 

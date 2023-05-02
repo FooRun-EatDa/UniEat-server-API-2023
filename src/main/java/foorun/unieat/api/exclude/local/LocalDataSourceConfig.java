@@ -1,6 +1,5 @@
 package foorun.unieat.api.exclude.local;
 
-import com.jcraft.jsch.JSchException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -30,12 +29,9 @@ public class LocalDataSourceConfig {
 
             url = url.replace(targetHost + ":" + targetPort, "localhost:" + bindPort);
             log.debug("tunneling database url: {}", url);
-        } catch (JSchException e) {
-            log.debug("tunneling 실패", e);
-            throw new RuntimeException();
         } catch (Exception e) {
             log.debug("tunneling 실패", e);
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
 
         return DataSourceBuilder.create()

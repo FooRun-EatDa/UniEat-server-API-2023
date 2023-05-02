@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 public class UniEatMemberId implements Serializable {
     private String provider;
     private String primaryId;

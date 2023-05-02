@@ -10,6 +10,7 @@ import foorun.unieat.api.model.database.member.repository.UniEatMemberAuthReposi
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
 import foorun.unieat.common.http.FooRunResponseCode;
 import foorun.unieat.common.http.FooRunToken;
+import foorun.unieat.common.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -24,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,7 +49,7 @@ public class UniEatOauth2AuthenticationSuccessHandler implements AuthenticationS
             final LocalDateTime expiredDate = user.getAttribute("expired_date");
 
             FooRunToken token = jwtProvider.createToken(provider, username, expiredDate, authentication.getAuthorities().stream().map(e -> e.getAuthority()).collect(Collectors.joining(", ")));
-            UniEatMemberAuthEntity auth = authRepository.findById(new UniEatMemberId(provider, username))
+            UniEatMemberAuthEntity auth = authRepository.findById(UniEatMemberId.of(provider, username))
                     .orElse(UniEatMemberAuthEntity.builder()
                             .provider(provider)
                             .primaryId(username)
@@ -56,15 +59,22 @@ public class UniEatOauth2AuthenticationSuccessHandler implements AuthenticationS
             auth.setRefreshToken(token.getRefreshToken());
             authRepository.save(auth);
 
-            response.addHeader(HttpHeaders.AUTHORIZATION, token.getAccessToken());
-            response.addHeader(JwtProvider.REFRESH_TOKEN_HEADER_NAME, token.getRefreshToken());
+            //response.addHeader(HttpHeaders.AUTHORIZATION, token.getAccessToken());
+            //response.addHeader(JwtProvider.REFRESH_TOKEN_HEADER_NAME, token.getRefreshToken());
 
             log.debug("#### ACCESS TOKEN : {}", token.getAccessToken());
             log.debug("#### REFRESH TOKEN: {}", token.getRefreshToken());
 
-            UniEatMemberEntity member = memberRepository.findById(new UniEatMemberId(provider, username)).orElse(UniEatMemberEntity.builder().provider(provider).primaryId(username).build());
+            UniEatMemberEntity member = memberRepository.findById(UniEatMemberId.of(provider, username)).orElse(UniEatMemberEntity.builder().provider(provider).primaryId(username).build());
             member.updateSignInNow();
             memberRepository.save(member);
+
+            Map<String, String> body = new LinkedHashMap<>();
+            body.put(HttpHeaders.AUTHORIZATION, token.getAccessToken());
+            body.put(JwtProvider.REFRESH_TOKEN_HEADER_NAME, token.getRefreshToken());
+
+            response.getWriter().write(JsonUtil.asJson(body));
+            response.getWriter().flush();
         } catch (UniEatUnAuthorizationException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, FooRunResponseCode.CODE_401.getResponseMessage());
         } catch (UniEatForbiddenException e) {
