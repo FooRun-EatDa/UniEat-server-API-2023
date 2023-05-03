@@ -1,5 +1,6 @@
 package foorun.unieat.api.service.email;
 
+import foorun.unieat.api.model.base.dto.UniEatResponseDTO;
 import foorun.unieat.api.model.database.email.repository.EmailVerificationCodeRepository;
 import foorun.unieat.api.model.domain.email.request.EmailVerification;
 import foorun.unieat.api.service.UniEatCommonService;
@@ -32,7 +33,7 @@ public class EmailVerificationService implements UniEatCommonService<EmailVerifi
         return true;
     }
     @Override
-    public ResponseEntity service(EmailVerification form) {
+    public UniEatResponseDTO service(EmailVerification form) {
         return null;
     }
 }

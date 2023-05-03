@@ -1,6 +1,7 @@
 package foorun.unieat.api.controller;
 
 import foorun.unieat.api.auth.JwtProvider;
+import foorun.unieat.api.exception.UniEatServerErrorException;
 import foorun.unieat.api.exception.UniEatUnAuthorizationException;
 import foorun.unieat.api.model.domain.UniEatCommonResponse;
 import foorun.unieat.api.model.domain.member.request.MemberSignUp;
@@ -43,13 +44,13 @@ public class MemberController {
     }*/
 
     @RequestMapping(value = "/sign-in/{providerStr}", method = RequestMethod.POST)
-    public Map<String, String> signInKakao(@PathVariable String providerStr, @Validated @RequestBody OAuth2SignIn form) {
+    public ResponseEntity signInKakao(@PathVariable String providerStr, @Validated @RequestBody OAuth2SignIn form) {
         if (providerStr == null || providerStr.trim().isEmpty()) {
             throw new UniEatUnAuthorizationException();
         }
         SocialLoginType loginType;
         try {
-            loginType = SocialLoginType.valueOf(providerStr.toLowerCase());
+            loginType = SocialLoginType.valueOf(providerStr.toUpperCase());
         } catch (Exception e) {
             log.error("#### 지원하지 않는 소셜 로그인 시도: {}", providerStr);
             throw new UniEatUnAuthorizationException();
@@ -61,16 +62,14 @@ public class MemberController {
                 form.setAccessToken(BEARER + " " + form.getAccessToken());
             }
         }
-
-        ResponseEntity<OAuth2Token> response = memberSignInService.service(loginType, form);
-        OAuth2Token token = response.getBody();
-        FooRunToken fooRunToken = token.getToken();
+        OAuth2Token result = memberSignInService.service(loginType, form);
+        FooRunToken fooRunToken = result.getToken();
 
         Map<String, String> body = new LinkedHashMap<>();
         body.put(HttpHeaders.AUTHORIZATION, fooRunToken.getAccessToken());
         body.put(JwtProvider.REFRESH_TOKEN_HEADER_NAME, fooRunToken.getRefreshToken());
 
-        return body;
+        return UniEatCommonResponse.success(body);
     }
 
     /* OAUTH 구현하면서 다르게 처리 */
@@ -78,9 +77,13 @@ public class MemberController {
     @Deprecated
     public ResponseEntity signUp(@Validated @RequestBody MemberSignUp form) {
         log.debug("try sign up: {}", form);
-        ResponseEntity response = memberSignUpService.service(form);
+        try {
+            memberSignUpService.service(form);
+        } catch (Exception e) {
+            throw new UniEatServerErrorException();
+        }
 
-        return response;
+        return UniEatCommonResponse.success();
     }
 
     @GetMapping("/test")

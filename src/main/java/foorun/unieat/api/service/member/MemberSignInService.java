@@ -2,6 +2,7 @@ package foorun.unieat.api.service.member;
 
 import foorun.unieat.api.auth.JwtProvider;
 import foorun.unieat.api.exception.UniEatUnAuthorizationException;
+import foorun.unieat.api.model.base.dto.UniEatResponseDTO;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberAuthEntity;
 import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberAuthRepository;
@@ -14,6 +15,7 @@ import foorun.unieat.api.model.domain.member.request.OAuth2SignIn;
 import foorun.unieat.api.model.domain.member.response.OAuth2Token;
 import foorun.unieat.api.service.UniEatCommonService;
 import foorun.unieat.common.http.FooRunToken;
+import foorun.unieat.common.rules.ManagedStatusType;
 import foorun.unieat.common.rules.SocialLoginType;
 import foorun.unieat.common.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
@@ -48,21 +50,22 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
 
     @Deprecated
     @Override
-    public ResponseEntity service(MemberSignIn form) {
-        UniEatMemberEntity member = /*loadUserByUsername(form.getPrimaryId())*/null;
+    public UniEatResponseDTO service(MemberSignIn form) {
+        UniEatMemberEntity member = UniEatMemberEntity.builder().status(ManagedStatusType.INACTIVE).build();
         if (!member.isEnabled()) {
             throw new UniEatForbiddenException();
         }
 
-        member.updateSignInNow();
+        /*member.updateSignInNow();
 
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         HttpHeaders httpHeaders = HttpHeaders.readOnlyHttpHeaders(headers);
 
-        return UniEatCommonResponse.success(httpHeaders);
+        return UniEatCommonResponse.success(httpHeaders);*/
+        return null;
     }
 
-    public ResponseEntity service(SocialLoginType provider, OAuth2SignIn form) {
+    public OAuth2Token service(SocialLoginType provider, OAuth2SignIn form) {
         ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(provider.name().toLowerCase());
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
         headers.set(HttpHeaders.AUTHORIZATION, form.getAccessToken());
@@ -182,6 +185,6 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
         memberEntity.updateSignInNow();
         memberRepository.save(memberEntity);
 
-        return UniEatCommonResponse.success(OAuth2Token.of(token));
+        return OAuth2Token.of(token);
     }
 }

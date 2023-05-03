@@ -12,8 +12,7 @@ import foorun.unieat.common.util.JsonUtil;
  * Shallow Copy: 스택 영역에 존재하는 같은 주소값을 복사하므로 실제 값이 같음
  * Deep Copy: 실제값을 새로운 메모리 공간에 복사하므로 원본 객체로부터 독립적인 객체를 생성
  */
-public interface UniEatBaseDTO extends Serializable, Cloneable {
-
+public interface UniEatResponseDTO extends Serializable, Cloneable {
     /**
      * 현재 객체를 JSON 형식의 문자열로 변환하여 반환
      */

@@ -44,7 +44,7 @@ public class OAuth2DetailsService implements OAuth2UserService<OAuth2UserRequest
         Object gender = null;
 
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
-        SocialLoginType loginType = SocialLoginType.valueOf(provider.toLowerCase());
+        SocialLoginType loginType = SocialLoginType.valueOf(provider.toUpperCase());
         switch (loginType) {
             case FOORUN: {
                 // 자체 로그인?

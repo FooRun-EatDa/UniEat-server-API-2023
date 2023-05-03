@@ -1,6 +1,7 @@
 package foorun.unieat.api.service.member;
 
-import foorun.unieat.api.model.base.dto.UniEatBaseDTO;
+import foorun.unieat.api.model.base.dto.UniEatRequestDTO;
+import foorun.unieat.api.model.base.dto.UniEatResponseDTO;
 import foorun.unieat.api.model.domain.UniEatCommonResponse;
 import foorun.unieat.api.service.UniEatCommonService;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class MemberSignOutService implements UniEatCommonService {
 
     @Override
-    public ResponseEntity service(UniEatBaseDTO form) {
-        return UniEatCommonResponse.success();
+    public UniEatResponseDTO service(UniEatRequestDTO form) {
+        return null;
     }
 }

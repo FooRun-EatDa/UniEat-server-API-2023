@@ -2,6 +2,7 @@ package foorun.unieat.api.service.member;
 
 import foorun.unieat.api.exception.UniEatBadRequestException;
 import foorun.unieat.api.exception.UniEatForbiddenException;
+import foorun.unieat.api.model.base.dto.UniEatResponseDTO;
 import foorun.unieat.api.model.domain.member.request.MemberSignUp;
 import foorun.unieat.api.model.domain.UniEatCommonResponse;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
@@ -23,7 +24,7 @@ public class MemberSignUpService implements UniEatCommonService<MemberSignUp> {
     private final UniEatMemberRepository memberRepository;
 
     @Override
-    public ResponseEntity service(MemberSignUp form) {
+    public UniEatResponseDTO service(MemberSignUp form) {
         if (!form.getPassword().equals(form.getPasswordRe())) {
             throw new UniEatBadRequestException();
         }
@@ -34,6 +35,6 @@ public class MemberSignUpService implements UniEatCommonService<MemberSignUp> {
 
         memberRepository.save(newMember);
 
-        return UniEatCommonResponse.success();
+        return null;
     }
 }
