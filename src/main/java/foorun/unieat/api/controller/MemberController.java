@@ -1,6 +1,7 @@
 package foorun.unieat.api.controller;
 
 import foorun.unieat.api.auth.JwtProvider;
+import foorun.unieat.api.exception.UniEatUnAuthorizationException;
 import foorun.unieat.api.model.domain.UniEatCommonResponse;
 import foorun.unieat.api.model.domain.member.request.MemberSignUp;
 import foorun.unieat.api.model.domain.member.request.OAuth2SignIn;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +44,23 @@ public class MemberController {
 
     @RequestMapping(value = "/sign-in/{providerStr}", method = RequestMethod.POST)
     public Map<String, String> signInKakao(@PathVariable String providerStr, @Validated @RequestBody OAuth2SignIn form) {
-        SocialLoginType loginType = SocialLoginType.valueOf(providerStr.toLowerCase());
+        if (providerStr == null || providerStr.trim().isEmpty()) {
+            throw new UniEatUnAuthorizationException();
+        }
+        SocialLoginType loginType;
+        try {
+            loginType = SocialLoginType.valueOf(providerStr.toLowerCase());
+        } catch (Exception e) {
+            log.error("#### 지원하지 않는 소셜 로그인 시도: {}", providerStr);
+            throw new UniEatUnAuthorizationException();
+        }
+
+        if (loginType == SocialLoginType.KAKAO) {
+            final String BEARER = OAuth2AccessToken.TokenType.BEARER.getValue();
+            if (!BEARER.contains(form.getAccessToken())) {
+                form.setAccessToken(BEARER + " " + form.getAccessToken());
+            }
+        }
 
         ResponseEntity<OAuth2Token> response = memberSignInService.service(loginType, form);
         OAuth2Token token = response.getBody();
