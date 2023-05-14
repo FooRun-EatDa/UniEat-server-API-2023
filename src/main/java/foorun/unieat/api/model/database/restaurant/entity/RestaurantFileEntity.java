@@ -17,6 +17,7 @@ import javax.persistence.*;
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @IdClass(RestaurantFileIdEntity.class)
 @Table(name = "restaurant_file")
+@Deprecated
 public class RestaurantFileEntity extends BaseFileEntity implements JsonSerializable {
 
     @Id

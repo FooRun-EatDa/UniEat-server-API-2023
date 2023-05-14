@@ -1,7 +1,7 @@
 package foorun.unieat.api.model.database.member.entity;
 
 import foorun.unieat.api.model.base.jpa.UniEatBaseTimeEntity;
-import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
+import foorun.unieat.api.model.database.member.entity.primary_key.UniEatMemberId;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

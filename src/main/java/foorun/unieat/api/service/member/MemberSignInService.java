@@ -4,7 +4,7 @@ import foorun.unieat.api.auth.JwtProvider;
 import foorun.unieat.api.exception.UniEatUnAuthorizationException;
 import foorun.unieat.api.model.base.dto.UniEatResponseDTO;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberMyPageEntity;
-import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
+import foorun.unieat.api.model.database.member.entity.primary_key.UniEatMemberId;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberMyPageRepository;
 import foorun.unieat.api.model.domain.member.request.MemberSignIn;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;

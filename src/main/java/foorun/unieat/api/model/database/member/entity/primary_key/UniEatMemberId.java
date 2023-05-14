@@ -1,4 +1,4 @@
-package foorun.unieat.api.model.database.member.entity.clazz;
+package foorun.unieat.api.model.database.member.entity.primary_key;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

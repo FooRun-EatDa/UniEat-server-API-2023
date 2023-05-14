@@ -1,8 +1,7 @@
 package foorun.unieat.api.model.database.member.entity;
 
 import foorun.unieat.api.model.base.security.UniEatUserDetails;
-import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
-import foorun.unieat.api.model.database.member.repository.UniEatMemberMyPageRepository;
+import foorun.unieat.api.model.database.member.entity.primary_key.UniEatMemberId;
 import foorun.unieat.common.rules.ManagedStatusType;
 import foorun.unieat.common.rules.MemberRole;
 import lombok.AccessLevel;

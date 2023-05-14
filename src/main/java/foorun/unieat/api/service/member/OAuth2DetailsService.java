@@ -2,7 +2,7 @@ package foorun.unieat.api.service.member;
 
 import foorun.unieat.api.exception.UniEatForbiddenException;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
-import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
+import foorun.unieat.api.model.database.member.entity.primary_key.UniEatMemberId;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
 import foorun.unieat.common.rules.SocialLoginType;
 import lombok.RequiredArgsConstructor;
