@@ -1,14 +1,17 @@
 package foorun.unieat.api.model.database.restaurant.entity;
 
 import foorun.unieat.api.model.base.jpa.UniEatBaseTimeEntity;
+import foorun.unieat.api.model.database.menu.entity.FoodMenuEntity;
 import foorun.unieat.common.rules.ManagedStatusType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -51,6 +54,7 @@ public class RestaurantEntity extends UniEatBaseTimeEntity {
     /**
      * 식당 대표이미지 sequence
      */
+    @ToString.Exclude
     @Column(name = "restaurant_title_image_seq")
     private Integer titleImageSeq;
 
@@ -105,31 +109,22 @@ public class RestaurantEntity extends UniEatBaseTimeEntity {
     /**
      * 식당 상태 관리
      */
-    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "manage_status", length = 10)
     private ManagedStatusType status = ManagedStatusType.ACTIVE;
 
-    @Builder.Default
-    @OneToMany
+    @ToString.Exclude
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     private Set<RestaurantFoodCategoryEntity> foodCategories = new HashSet<>();
 
-    @Builder.Default
-    @OneToMany
+    @ToString.Exclude
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id")
     private List<RestaurantImageEntity> restaurantImages = new ArrayList<>();
 
-    /*
     @ToString.Exclude
-    @Builder.Default
-    @OneToMany
-    @JoinColumn(name="restaurant_id")
-    private Set<FoodEntity> foods = new HashSet<>();
-
-    @ToString.Exclude
-    @Builder.Default
-    @OneToMany(mappedBy = "restaurant")
-    private Set<RestaurantFileEntity> files = new HashSet<>();
-     */
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurant_id")
+    private Set<FoodMenuEntity> foodMenu = new HashSet<>();
 }

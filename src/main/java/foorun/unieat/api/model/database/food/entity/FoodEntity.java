@@ -19,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor(access=AccessLevel.PRIVATE)
 @DynamicUpdate
 @Table(name="food")
+@Deprecated
 public class FoodEntity extends UniEatBaseTimeEntity {
 
     /**

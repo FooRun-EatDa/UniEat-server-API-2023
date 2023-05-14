@@ -16,13 +16,21 @@ CREATE TABLE `member_base` (
 CREATE TABLE `member_mypage` (
     `member_provider` varchar(20) NOT NULL COMMENT '회원 소셜로그인 가입 공급자',
     `member_id` varchar(200) NOT NULL COMMENT '회원 고유 ID',
-    `member_nickname` varchar(255) DEFAULT NULL COMMENT '회원 닉네임',
-    `member_profile_image` varchar(255) DEFAULT NULL COMMENT '회원 프로필사진',
+    `member_nickname` varchar(50) DEFAULT NULL COMMENT '회원 닉네임',
+    `member_profile_image` varchar(500) DEFAULT NULL COMMENT '회원 프로필사진',
+    `member_introduction` varchar(50) DEFAULT NULL COMMENT '자기소개 문구',
     `created_date` datetime NOT NULL DEFAULT current_timestamp() COMMENT '생성일시',
     `modified_date` datetime NOT NULL DEFAULT current_timestamp() COMMENT '수정일시',
-    PRIMARY KEY (`member_provider`, `member_id`),
+    PRIMARY KEY (`member_provider`,`member_id`),
     UNIQUE KEY `member_nickname_UNIQUE` (`member_nickname`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='회원 마이페이지 정보'
+;
+
+CREATE TABLE `category_food` (
+    `category_id` varchar(3) NOT NULL COMMENT '분류 ID',
+    `category_name` varchar(50) DEFAULT NULL COMMENT '항목 이름',
+    PRIMARY KEY (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='음식 분류항목'
 ;
 
 CREATE TABLE `restaurant_base` (
@@ -56,13 +64,21 @@ CREATE TABLE `restaurant_image` (
     `restaurant_id` bigint(20) NOT NULL COMMENT '식당 ID',
     `seq` int(11) DEFAULT NULL COMMENT '이미지 순서',
     `file_url` varchar(500) DEFAULT NULL COMMENT '파일 경로',
+    `created_date` datetime NOT NULL DEFAULT current_timestamp() COMMENT '생성일시',
+    `modified_date` datetime NOT NULL DEFAULT current_timestamp() COMMENT '수정일시',
     PRIMARY KEY (`restaurant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='식당 이미지 관리'
-;
 
-CREATE TABLE `category_food` (
-    `category_id` varchar(3) NOT NULL COMMENT '분류 ID',
-    `category_name` varchar(50) DEFAULT NULL COMMENT '항목 이름',
-    PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='음식 분류항목'
-;
+CREATE TABLE `menu_base` (
+    `restaurant_id` bigint(20) NOT NULL COMMENT '식당 ID',
+    `menu_id` bigint(20) NOT NULL COMMENT '메뉴 ID',
+    `seq` int(11) DEFAULT NULL COMMENT '노출 순서',
+    `menu_name` varchar(50) DEFAULT NULL COMMENT '메뉴 이름',
+    `menu_image_url` varchar(500) DEFAULT NULL COMMENT '메뉴 이미지',
+    `menu_price` bigint(20) DEFAULT NULL COMMENT '메뉴 가격(단위: 원)',
+    `menu_category_id` varchar(3) DEFAULT NULL COMMENT '메뉴 항목 ID',
+    `menu_recommend` tinyint(1) DEFAULT NULL COMMENT '메뉴 추천 여부',
+    `created_date` datetime NOT NULL DEFAULT current_timestamp() COMMENT '생성일시',
+    `modified_date` datetime NOT NULL DEFAULT current_timestamp() COMMENT '수정일시',
+    PRIMARY KEY (`restaurant_id`,`menu_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='음식 메뉴 기본정보'
