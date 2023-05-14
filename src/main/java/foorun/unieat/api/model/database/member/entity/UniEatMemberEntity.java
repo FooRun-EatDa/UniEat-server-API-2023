@@ -2,6 +2,7 @@ package foorun.unieat.api.model.database.member.entity;
 
 import foorun.unieat.api.model.base.security.UniEatUserDetails;
 import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
+import foorun.unieat.api.model.database.member.repository.UniEatMemberMyPageRepository;
 import foorun.unieat.common.rules.ManagedStatusType;
 import foorun.unieat.common.rules.MemberRole;
 import lombok.AccessLevel;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.validation.annotation.Validated;
@@ -55,10 +57,11 @@ public class UniEatMemberEntity extends UniEatUserDetails {
     private String primaryId;
 
     /**
-     * 회원 PASSWORD
+     * 회원 REFRESH TOKEN 관리
      */
-    @Column(name = "member_password")
-    private String password;
+    @Setter
+    @Column(name = "refresh_token")
+    private String refreshToken;
 
     /**
      * 최종 로그인 일시
@@ -98,31 +101,14 @@ public class UniEatMemberEntity extends UniEatUserDetails {
     private LocalDateTime expiredDate = LocalDateTime.of(9999, 12, 31, 23, 59, 59);
 
     /**
-     * REFRESH TOKEN 발급
+     * 회원 마이페이지 연결 ID
      */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "member_provider", referencedColumnName = "member_provider"),
             @JoinColumn(name = "member_id", referencedColumnName = "member_id")
-        }
-    )
-    private UniEatMemberAuthEntity memberAuth;
-
-    /**
-     * 회원 마이페이지 정보 FK
-     */
-    @OneToOne
-    @JoinColumn(name = "mypage_id")
-    private UniEatMemberMyPageEntity MemberMyPageEntity;
-
-    /**
-     * 비밀번호 변경
-     *
-     * @param password 변경할 비밀번호
-     */
-    public void changePassword(String password) {
-        this.password = password;
-    }
+    })
+    private UniEatMemberMyPageEntity myPage;
 
     /**
      * 최종 로그인 일시 갱신
@@ -149,7 +135,7 @@ public class UniEatMemberEntity extends UniEatUserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return null;
     }
 
     @Override

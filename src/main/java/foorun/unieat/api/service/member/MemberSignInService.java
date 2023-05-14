@@ -3,11 +3,10 @@ package foorun.unieat.api.service.member;
 import foorun.unieat.api.auth.JwtProvider;
 import foorun.unieat.api.exception.UniEatUnAuthorizationException;
 import foorun.unieat.api.model.base.dto.UniEatResponseDTO;
-import foorun.unieat.api.model.database.member.entity.UniEatMemberAuthEntity;
+import foorun.unieat.api.model.database.member.entity.UniEatMemberMyPageEntity;
 import foorun.unieat.api.model.database.member.entity.clazz.UniEatMemberId;
-import foorun.unieat.api.model.database.member.repository.UniEatMemberAuthRepository;
+import foorun.unieat.api.model.database.member.repository.UniEatMemberMyPageRepository;
 import foorun.unieat.api.model.domain.member.request.MemberSignIn;
-import foorun.unieat.api.model.domain.UniEatCommonResponse;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
 import foorun.unieat.api.exception.UniEatForbiddenException;
@@ -24,18 +23,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -44,9 +39,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
     private final ClientRegistrationRepository clientRegistrationRepository;
+
     private final JwtProvider jwtProvider;
+
     private final UniEatMemberRepository memberRepository;
-    private final UniEatMemberAuthRepository authRepository;
+    private final UniEatMemberMyPageRepository myPageRepository;
 
     @Deprecated
     @Override
@@ -73,6 +70,9 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
         log.debug("#### {} 로그인 시도", provider.name());
         ResponseEntity<String> principal = null;
         try {
+            /*
+            * 소셜 로그인 사용자 정보 획득 시도
+            */
             RestTemplate restTemplate = new RestTemplate();
             principal = restTemplate.exchange(
                     clientRegistration.getProviderDetails().getUserInfoEndpoint().getUri(),
@@ -100,7 +100,6 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
         String userNameAttributeName = clientRegistration.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
         Map<String, Object> attributes = JsonUtil.ofJson(principal.getBody(), Map.class);
         String username = null;
-        String password = null;
         Object ageRange = null;
         Object birthday = null;
         Object birthdayType = null;
@@ -115,14 +114,12 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
                 log.debug("apple attributes: {}", attributes);
                 /* TODO: apple 구현 필요 */
                 username = String.valueOf(attributes.get(userNameAttributeName));
-                password = null;
             } break;
 
             case GOOGLE: {
                 /* TODO: google 구현 필요 */
                 log.debug("google attributes: {}", attributes);
                 username = String.valueOf(attributes.get(userNameAttributeName));
-                password = null;
             } break;
 
             case NAVER: {
@@ -133,12 +130,10 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
                 userNameAttributeName = "id";
 
                 username = String.valueOf(attributes.get(userNameAttributeName));
-                password = null;
             } break;
 
             case KAKAO: {
                 username = String.valueOf(attributes.get(userNameAttributeName));
-                password = null;
 
                 final String keyAgeRange = "age_range";
                 final String keyBirthday = "birthday";
@@ -163,28 +158,32 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
                 .orElse(UniEatMemberEntity.builder()
                         .provider(provider.name().toLowerCase())
                         .primaryId(username)
-                        .password(password)
                         .build()
                 );
         if (!memberEntity.isEnabled()) {
             log.warn("#### disabled user: {}", memberEntity.getProvider() + "_" + memberEntity.getPrimaryId());
             throw new UniEatForbiddenException();
         }
+        autoCreateMemberEntityRelationship(memberEntity);
 
         FooRunToken token = jwtProvider.createToken(provider.name().toLowerCase(), username, memberEntity.getExpiredDate(), memberEntity.getAuthorities().stream().map(e -> e.getAuthority()).collect(Collectors.joining(", ")));
-        UniEatMemberAuthEntity auth = authRepository.findById(findMember)
-                .orElse(UniEatMemberAuthEntity.builder()
-                        .provider(provider.name().toLowerCase())
-                        .primaryId(username)
-                        .build()
-        );
-
-        auth.setRefreshToken(token.getRefreshToken());
-        authRepository.save(auth);
-
+        memberEntity.setRefreshToken(token.getRefreshToken());
         memberEntity.updateSignInNow();
+
         memberRepository.save(memberEntity);
 
         return OAuth2Token.of(token);
+    }
+
+    private void autoCreateMemberEntityRelationship(UniEatMemberEntity member) {
+        if (member.getMyPage() == null) {
+            UniEatMemberMyPageEntity memberMyPage = UniEatMemberMyPageEntity.builder()
+                    .provider(member.getProvider())
+                    .primaryId(member.getPrimaryId())
+                    .nickname(member.getProvider() + "_" + member.getPrimaryId())
+                    .build();
+
+            myPageRepository.save(memberMyPage);
+        }
     }
 }

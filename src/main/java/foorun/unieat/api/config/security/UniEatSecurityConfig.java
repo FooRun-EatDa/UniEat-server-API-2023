@@ -6,7 +6,6 @@ import foorun.unieat.api.config.security.filter.UniEatJwtAuthentication;
 import foorun.unieat.api.config.security.handler.UniEatAccessDeniedHandler;
 import foorun.unieat.api.config.security.handler.UniEatAuthenticationEntryPoint;
 import foorun.unieat.api.config.oauth.UniEatOauth2AuthenticationSuccessHandler;
-import foorun.unieat.api.model.database.member.repository.UniEatMemberAuthRepository;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
 import foorun.unieat.api.service.member.OAuth2DetailsService;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,6 @@ public class UniEatSecurityConfig {
     private final OAuth2DetailsService oAuth2DetailsService;
 
     private final UniEatMemberRepository memberRepository;
-    private final UniEatMemberAuthRepository authRepository;
     private final JwtProvider jwtProvider;
 
     /* Spring security Password Encoder */
@@ -111,7 +109,7 @@ public class UniEatSecurityConfig {
             .and()
 
             /* 회원 인증처리 전 Json Web Token 확인 및 재발급 여부 */
-            .addFilterBefore(new UniEatJwtAuthentication(jwtProvider, memberRepository, authRepository), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new UniEatJwtAuthentication(jwtProvider, memberRepository), UsernamePasswordAuthenticationFilter.class)
 
             .oauth2Login()
             .clientRegistrationRepository(clientRegistrationRepository)
@@ -124,7 +122,7 @@ public class UniEatSecurityConfig {
             .and()
             .userInfoEndpoint().userService(oAuth2DetailsService)   /* oauth2 login 성공 이후 설정 */
             .and()
-            .successHandler(new UniEatOauth2AuthenticationSuccessHandler(jwtProvider, memberRepository, authRepository))
+            .successHandler(new UniEatOauth2AuthenticationSuccessHandler(jwtProvider, memberRepository))
             .failureHandler(new UniEatOauth2AuthenticationFailureHandler())
         ;
 

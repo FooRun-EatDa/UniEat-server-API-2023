@@ -1,14 +1,11 @@
 package foorun.unieat.api.controller;
 
 import foorun.unieat.api.auth.JwtProvider;
-import foorun.unieat.api.exception.UniEatServerErrorException;
 import foorun.unieat.api.exception.UniEatUnAuthorizationException;
 import foorun.unieat.api.model.domain.UniEatCommonResponse;
-import foorun.unieat.api.model.domain.member.request.MemberSignUp;
 import foorun.unieat.api.model.domain.member.request.OAuth2SignIn;
 import foorun.unieat.api.model.domain.member.response.OAuth2Token;
 import foorun.unieat.api.service.member.MemberSignInService;
-import foorun.unieat.api.service.member.MemberSignUpService;
 import foorun.unieat.common.http.FooRunToken;
 import foorun.unieat.common.rules.SocialLoginType;
 import lombok.RequiredArgsConstructor;
@@ -32,19 +29,9 @@ import java.util.Map;
 @RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
-    private final MemberSignUpService memberSignUpService;
     private final MemberSignInService memberSignInService;
-
-    /*@RequestMapping(value = "/sign-in", method = RequestMethod.POST)
-    public ResponseEntity oAuthSignIn(@Validated @RequestBody OAuth2User form) {
-        log.debug("try sign in: {}", form);
-        ResponseEntity response = memberSignInService.service(form);
-
-        return response;
-    }*/
-
     @RequestMapping(value = "/sign-in/{providerStr}", method = RequestMethod.POST)
-    public ResponseEntity signInKakao(@PathVariable String providerStr, @Validated @RequestBody OAuth2SignIn form) {
+    public ResponseEntity signInOAuth(@PathVariable String providerStr, @Validated @RequestBody OAuth2SignIn form) {
         if (providerStr == null || providerStr.trim().isEmpty()) {
             throw new UniEatUnAuthorizationException();
         }
@@ -70,20 +57,6 @@ public class MemberController {
         body.put(JwtProvider.REFRESH_TOKEN_HEADER_NAME, fooRunToken.getRefreshToken());
 
         return UniEatCommonResponse.success(body);
-    }
-
-    /* OAUTH 구현하면서 다르게 처리 */
-    //@RequestMapping(value = "/sign-up", method = RequestMethod.POST)
-    @Deprecated
-    public ResponseEntity signUp(@Validated @RequestBody MemberSignUp form) {
-        log.debug("try sign up: {}", form);
-        try {
-            memberSignUpService.service(form);
-        } catch (Exception e) {
-            throw new UniEatServerErrorException();
-        }
-
-        return UniEatCommonResponse.success();
     }
 
     @GetMapping("/test")

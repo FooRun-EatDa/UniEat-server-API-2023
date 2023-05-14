@@ -37,7 +37,6 @@ public class OAuth2DetailsService implements OAuth2UserService<OAuth2UserRequest
         String provider = userRequest.getClientRegistration().getRegistrationId();
         Map<String, Object> attributes = oAuth2User.getAttributes();
         String username = null;
-        String password = null;
         Object ageRange = null;
         Object birthday = null;
         Object birthdayType = null;
@@ -54,14 +53,12 @@ public class OAuth2DetailsService implements OAuth2UserService<OAuth2UserRequest
                 log.debug("apple attributes: {}", attributes);
                 /* TODO: apple 구현 필요 */
                 username = String.valueOf(attributes.get(userNameAttributeName));
-                password = null;
             } break;
 
             case GOOGLE: {
                 /* TODO: google 구현 필요 */
                 log.debug("google attributes: {}", attributes);
                 username = String.valueOf(attributes.get(userNameAttributeName));
-                password = null;
             } break;
 
             case NAVER: {
@@ -72,12 +69,10 @@ public class OAuth2DetailsService implements OAuth2UserService<OAuth2UserRequest
                 userNameAttributeName = "id";
 
                 username = String.valueOf(attributes.get(userNameAttributeName));
-                password = null;
             } break;
 
             case KAKAO: {
                 username = String.valueOf(attributes.get(userNameAttributeName));
-                password = null;
 
                 final String keyAgeRange = "age_range";
                 final String keyBirthday = "birthday";
@@ -102,7 +97,6 @@ public class OAuth2DetailsService implements OAuth2UserService<OAuth2UserRequest
                 .orElse(UniEatMemberEntity.builder()
                         .provider(provider)
                         .primaryId(username)
-                        .password(password)
                         .build());
 
         memberRepository.save(memberEntity);
