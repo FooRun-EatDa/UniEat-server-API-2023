@@ -30,8 +30,8 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
-@IdClass(UniEatMemberId.class)
 @DynamicUpdate
+@IdClass(UniEatMemberId.class)
 public class UniEatMemberMyPageEntity extends UniEatBaseTimeEntity {
     /**
      * 회원 접속경로
@@ -65,16 +65,19 @@ public class UniEatMemberMyPageEntity extends UniEatBaseTimeEntity {
     @Column(name = "member_introduction", length = 50)
     private String introduce;
 
-    public void changeNickname(@NotBlank String nickname) {
+    public UniEatMemberMyPageEntity changeNickname(@NotBlank String nickname) {
         this.nickname = nickname;
+        return this;
     }
 
-    public void changeProfileImage(MultipartFile file) {
+    public UniEatMemberMyPageEntity changeProfileImage(MultipartFile file) {
         /* todo: image 파일 보관 후, 해당 경로 URL 가져오기 및 데이터 바꿔치기 구현 */
         this.profileImagePath = file.getOriginalFilename();
+        return this;
     }
 
-    public void changeIntroduction(String introduce) {
+    public UniEatMemberMyPageEntity changeIntroduction(String introduce) {
         this.introduce = introduce;
+        return this;
     }
 }

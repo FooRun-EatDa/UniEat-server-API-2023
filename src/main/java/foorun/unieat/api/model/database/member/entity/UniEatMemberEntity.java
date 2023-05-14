@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.validation.annotation.Validated;
@@ -39,6 +40,7 @@ import java.util.Collections;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Builder
+@DynamicUpdate
 @IdClass(UniEatMemberId.class)
 public class UniEatMemberEntity extends UniEatUserDetails {
     /**
@@ -112,19 +114,22 @@ public class UniEatMemberEntity extends UniEatUserDetails {
     /**
      * 최종 로그인 일시 갱신
      */
-    public void updateSignInNow() {
+    public UniEatMemberEntity updateSignInNow() {
         this.lastSignInAt = LocalDateTime.now();
+        return this;
     }
 
     /**
      * 계정 잠금 갱신
      */
-    public void updateLocked(LocalDateTime date) {
-        lockedDate = date;
+    public UniEatMemberEntity updateLocked(LocalDateTime date) {
+        this.lockedDate = date;
+        return this;
     }
 
-    public void updateLocked(int year, int month, int day, int hour, int minute, int second) {
-        lockedDate = LocalDateTime.of(year, month, day, hour, minute, second);
+    public UniEatMemberEntity updateLocked(int year, int month, int day, int hour, int minute, int second) {
+        this.lockedDate = LocalDateTime.of(year, month - 1, day, hour, minute, second);
+        return this;
     }
 
     @Override
