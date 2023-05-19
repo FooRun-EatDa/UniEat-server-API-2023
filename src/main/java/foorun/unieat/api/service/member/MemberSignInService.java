@@ -2,7 +2,6 @@ package foorun.unieat.api.service.member;
 
 import foorun.unieat.api.auth.JwtProvider;
 import foorun.unieat.api.exception.UniEatUnAuthorizationException;
-import foorun.unieat.api.model.base.dto.UniEatResponseDTO;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberMyPageEntity;
 import foorun.unieat.api.model.database.member.entity.primary_key.UniEatMemberId;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberMyPageRepository;
@@ -10,102 +9,87 @@ import foorun.unieat.api.model.domain.member.request.MemberSignIn;
 import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
 import foorun.unieat.api.exception.UniEatForbiddenException;
-import foorun.unieat.api.model.domain.member.request.OAuth2SignIn;
 import foorun.unieat.api.model.domain.member.response.OAuth2Token;
 import foorun.unieat.api.service.UniEatCommonService;
 import foorun.unieat.common.http.FooRunToken;
-import foorun.unieat.common.rules.ManagedStatusType;
 import foorun.unieat.common.rules.SocialLoginType;
-import foorun.unieat.common.util.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
+public class MemberSignInService implements UniEatCommonService<MemberSignIn>, OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final ClientRegistrationRepository clientRegistrationRepository;
-
-    private final JwtProvider jwtProvider;
 
     private final UniEatMemberRepository memberRepository;
     private final UniEatMemberMyPageRepository myPageRepository;
 
-    @Deprecated
+    private final JwtProvider jwtProvider;
+
     @Override
-    public UniEatResponseDTO service(MemberSignIn form) {
-        UniEatMemberEntity member = UniEatMemberEntity.builder().status(ManagedStatusType.INACTIVE).build();
-        if (!member.isEnabled()) {
-            throw new UniEatForbiddenException();
-        }
-
-        /*member.updateSignInNow();
-
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        HttpHeaders httpHeaders = HttpHeaders.readOnlyHttpHeaders(headers);
-
-        return UniEatCommonResponse.success(httpHeaders);*/
-        return null;
-    }
-
-    public OAuth2Token service(SocialLoginType provider, OAuth2SignIn form) {
-        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(provider.name().toLowerCase());
-        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.set(HttpHeaders.AUTHORIZATION, form.getAccessToken());
-
-        log.debug("#### {} 로그인 시도", provider.name());
-        ResponseEntity<String> principal = null;
-        try {
-            /*
-            * 소셜 로그인 사용자 정보 획득 시도
-            */
-            RestTemplate restTemplate = new RestTemplate();
-            principal = restTemplate.exchange(
-                    clientRegistration.getProviderDetails().getUserInfoEndpoint().getUri(),
-                    HttpMethod.POST,
-                    new HttpEntity<>(headers),
-                    String.class
-            );
-        } catch (RestClientException e) {
-            log.error("#### oauth2 인증 실패: {}", e.getMessage());
+    public OAuth2Token service(MemberSignIn form) {
+        ClientRegistration provider = clientRegistrationRepository.findByRegistrationId(form.getProvider());
+        if (provider == null) {
+            log.error("#### 지원하지 않는 소셜 로그인 시도: {}", form.getProvider());
             throw new UniEatUnAuthorizationException();
         }
-
-        if (principal == null) {
-            log.error("#### oauth2 principal empty.");
-            throw new UniEatForbiddenException();
+        final OAuth2AccessToken.TokenType BEARER = OAuth2AccessToken.TokenType.BEARER;
+        String accessToken = form.getAccessToken();
+        if (accessToken.contains(BEARER.getValue())) {
+            accessToken = accessToken.replaceAll(BEARER.getValue(), "").trim();
         }
+        OAuth2AccessToken oauth2Token = new OAuth2AccessToken(BEARER, accessToken, Instant.now(), null, provider.getScopes());
+        OAuth2UserRequest userRequest = new OAuth2UserRequest(provider, oauth2Token);
 
-        if (!principal.getStatusCode().is2xxSuccessful()) {
-            log.error("#### oauth2 principal status: {}",  principal.getStatusCode().value());
-            throw new UniEatForbiddenException();
-        }
+        OAuth2User oAuth2User = loadUser(userRequest);
+        final String username = oAuth2User.getAttribute("username");
+        UniEatMemberEntity memberEntity = memberRepository.findById(UniEatMemberId.of(provider.getRegistrationId(), username)).get();
 
-        log.debug("#### principal: {}", JsonUtil.asJson(principal.getBody().toString(), true));
+        FooRunToken token = jwtProvider.createToken(memberEntity.getProvider(), memberEntity.getPrimaryId(), memberEntity.getExpiredDate(), memberEntity.getAuthorities().stream().map(e -> e.getAuthority()).collect(Collectors.joining(", ")));
+        memberEntity.setRefreshToken(token.getRefreshToken());
+        memberEntity.updateSignInNow();
 
-        String userNameAttributeName = clientRegistration.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
-        Map<String, Object> attributes = JsonUtil.ofJson(principal.getBody(), Map.class);
+        memberRepository.save(memberEntity);
+
+        return OAuth2Token.of(token);
+    }
+
+    @Override
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
+        /*OAuth 인증정보 불러오기 */
+        OAuth2User oAuth2User = delegate.loadUser(userRequest);
+        log.debug("OAUTH TOKEN TYPE : {}", userRequest.getAccessToken().getTokenType().getValue());
+        log.debug("OAUTH TOKEN VALUE: {}", userRequest.getAccessToken().getTokenValue());
+
+        ClientRegistration clientRegistration = userRequest.getClientRegistration();
+        Map<String, Object> attributes = oAuth2User.getAttributes();
         String username = null;
         Object ageRange = null;
         Object birthday = null;
         Object birthdayType = null;
         Object gender = null;
 
-        switch (provider) {
+        String provider = clientRegistration.getRegistrationId();
+        String userNameAttributeName = clientRegistration.getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+        SocialLoginType loginType = SocialLoginType.valueOf(provider.toUpperCase());
+        switch (loginType) {
             case FOORUN: {
                 // 자체 로그인?
             } break;
@@ -152,11 +136,11 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
                 throw new UniEatForbiddenException();
         }
 
-        UniEatMemberId findMember = UniEatMemberId.of(provider.name().toLowerCase(), username);
+        UniEatMemberId findMember = UniEatMemberId.of(provider, username);
         /* Member의 정보 업데이트나 신규 가입처리 TODO: DB model에 연령대, 생일, 성별이 추가되면 update할 것 */
         UniEatMemberEntity memberEntity = memberRepository.findById(findMember)
                 .orElse(UniEatMemberEntity.builder()
-                        .provider(provider.name().toLowerCase())
+                        .provider(provider)
                         .primaryId(username)
                         .build()
                 );
@@ -166,13 +150,17 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn> {
         }
         autoCreateMemberEntityRelationship(memberEntity);
 
-        FooRunToken token = jwtProvider.createToken(provider.name().toLowerCase(), username, memberEntity.getExpiredDate(), memberEntity.getAuthorities().stream().map(e -> e.getAuthority()).collect(Collectors.joining(", ")));
-        memberEntity.setRefreshToken(token.getRefreshToken());
-        memberEntity.updateSignInNow();
+        Map<String, Object> memberAttributes = new LinkedHashMap<>();
+        memberAttributes.put("provider", provider);
+        memberAttributes.put("username", username);
+        memberAttributes.put("expired_date", memberEntity.getExpiredDate());
+        memberAttributes.put("age_range", ageRange);
+        memberAttributes.put("birthday", birthday);
+        memberAttributes.put("birthday_type", birthdayType);
+        memberAttributes.put("gender", gender);
 
         memberRepository.save(memberEntity);
-
-        return OAuth2Token.of(token);
+        return new DefaultOAuth2User(memberEntity.getAuthorities(), memberAttributes, "username");
     }
 
     private void autoCreateMemberEntityRelationship(UniEatMemberEntity member) {

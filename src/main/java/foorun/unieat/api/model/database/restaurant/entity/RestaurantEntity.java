@@ -3,7 +3,6 @@ package foorun.unieat.api.model.database.restaurant.entity;
 import foorun.unieat.api.model.base.jpa.UniEatBaseTimeEntity;
 import foorun.unieat.api.model.database.menu.entity.FoodMenuEntity;
 import foorun.unieat.common.rules.ManagedStatusType;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 

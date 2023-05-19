@@ -8,9 +8,9 @@ import javax.validation.constraints.NotBlank;
 
 @Data(staticConstructor = "of")
 @Validated
-public class MemberSignIn implements UniEatRequestDTO {
-    @NotBlank
-    private final String provider;
+public class MemberSignOut implements UniEatRequestDTO {
     @NotBlank
     private final String accessToken;
+    @NotBlank
+    private final String refreshToken;
 }

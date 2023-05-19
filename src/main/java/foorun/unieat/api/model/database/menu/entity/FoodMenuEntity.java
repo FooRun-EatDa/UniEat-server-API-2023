@@ -1,6 +1,5 @@
 package foorun.unieat.api.model.database.menu.entity;
 
-import foorun.unieat.api.model.base.jpa.UniEatBaseEntity;
 import foorun.unieat.api.model.base.jpa.UniEatBaseTimeEntity;
 import foorun.unieat.api.model.database.category.entity.FoodCategoryEntity;
 import foorun.unieat.api.model.database.menu.entity.primary_key.FoodMenuId;

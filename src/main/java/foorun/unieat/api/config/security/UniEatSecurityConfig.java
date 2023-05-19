@@ -7,7 +7,7 @@ import foorun.unieat.api.config.security.handler.UniEatAccessDeniedHandler;
 import foorun.unieat.api.config.security.handler.UniEatAuthenticationEntryPoint;
 import foorun.unieat.api.config.oauth.UniEatOauth2AuthenticationSuccessHandler;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
-import foorun.unieat.api.service.member.OAuth2DetailsService;
+import foorun.unieat.api.service.member.MemberSignInService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -33,7 +33,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class UniEatSecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
-    private final OAuth2DetailsService oAuth2DetailsService;
+    private final MemberSignInService memberSignInService;
 
     private final UniEatMemberRepository memberRepository;
     private final JwtProvider jwtProvider;
@@ -110,7 +110,7 @@ public class UniEatSecurityConfig {
 
             /* 회원 인증처리 전 Json Web Token 확인 및 재발급 여부 */
             .addFilterBefore(new UniEatJwtAuthentication(jwtProvider, memberRepository), UsernamePasswordAuthenticationFilter.class)
-
+            /* OAuth2 WEB 인증 방식, 테스트용으로만 사용 */
             .oauth2Login()
             .clientRegistrationRepository(clientRegistrationRepository)
             .authorizedClientService(oAuth2AuthorizedClientService)
@@ -120,9 +120,9 @@ public class UniEatSecurityConfig {
             .and()
             .tokenEndpoint()                                        /* Access Token 발급 */
             .and()
-            .userInfoEndpoint().userService(oAuth2DetailsService)   /* oauth2 login 성공 이후 설정 */
+            .userInfoEndpoint().userService(memberSignInService)    /* oauth2 login 성공 이후 설정 */
             .and()
-            .successHandler(new UniEatOauth2AuthenticationSuccessHandler(jwtProvider, memberRepository))
+            .successHandler(new UniEatOauth2AuthenticationSuccessHandler())
             .failureHandler(new UniEatOauth2AuthenticationFailureHandler())
         ;
 

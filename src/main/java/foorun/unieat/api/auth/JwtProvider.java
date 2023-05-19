@@ -1,8 +1,6 @@
 package foorun.unieat.api.auth;
 
-import foorun.unieat.api.exception.UniEatForbiddenException;
-import foorun.unieat.api.exception.UniEatUnAuthorizationException;
-import foorun.unieat.api.model.base.security.UniEatUserDetails;
+import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
 import foorun.unieat.api.model.database.member.entity.primary_key.UniEatMemberId;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
 import foorun.unieat.common.http.FooRunToken;
@@ -110,7 +108,7 @@ public class JwtProvider {
                 .build();
     }
 
-    public UniEatUserDetails resolveToken(String token, UniEatMemberRepository memberRepository) {
+    public UniEatMemberEntity resolveToken(String token, UniEatMemberRepository memberRepository) {
         Claims claims = divideToken(token);
         // 정보 요소 확인
         String provider = claims.get(CLAIM_MEMBER_PROVIDER, String.class);
@@ -127,11 +125,7 @@ public class JwtProvider {
         }
 
         // 계정정보 확인
-        UniEatUserDetails memberInfo = memberRepository.findById(UniEatMemberId.of(provider, memberId)).orElseThrow(UniEatUnAuthorizationException::new);
-        if (!memberInfo.isEnabled()) {
-            throw new UniEatForbiddenException();
-        }
-
+        UniEatMemberEntity memberInfo = memberRepository.findById(UniEatMemberId.of(provider, memberId)).orElse(null);
         return memberInfo;
     }
 
