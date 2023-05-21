@@ -68,6 +68,7 @@ CREATE TABLE `restaurant_image` (
     `modified_date` datetime NOT NULL DEFAULT current_timestamp() COMMENT '수정일시',
     PRIMARY KEY (`restaurant_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='식당 이미지 관리'
+;
 
 CREATE TABLE `menu_base` (
     `restaurant_id` bigint(20) NOT NULL COMMENT '식당 ID',
@@ -82,3 +83,4 @@ CREATE TABLE `menu_base` (
     `modified_date` datetime NOT NULL DEFAULT current_timestamp() COMMENT '수정일시',
     PRIMARY KEY (`restaurant_id`,`menu_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='음식 메뉴 기본정보'
+;
