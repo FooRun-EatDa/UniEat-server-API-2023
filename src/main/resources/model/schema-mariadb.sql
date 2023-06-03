@@ -78,9 +78,9 @@ CREATE TABLE `menu_base` (
     `menu_image_url` varchar(500) DEFAULT NULL COMMENT '메뉴 이미지',
     `menu_price` bigint(20) DEFAULT NULL COMMENT '메뉴 가격(단위: 원)',
     `menu_category_id` varchar(3) DEFAULT NULL COMMENT '메뉴 항목 ID',
+    `menu_description` varchar(200) DEFAULT NULL COMMENT '메뉴 설명',
     `menu_recommend` tinyint(1) DEFAULT NULL COMMENT '메뉴 추천 여부',
     `created_date` datetime NOT NULL DEFAULT current_timestamp() COMMENT '생성일시',
     `modified_date` datetime NOT NULL DEFAULT current_timestamp() COMMENT '수정일시',
     PRIMARY KEY (`restaurant_id`,`menu_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='음식 메뉴 기본정보'
-;

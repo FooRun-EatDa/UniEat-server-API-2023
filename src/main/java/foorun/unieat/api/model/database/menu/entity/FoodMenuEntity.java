@@ -67,6 +67,12 @@ public class FoodMenuEntity extends UniEatBaseTimeEntity {
     private String categoryId;
 
     /**
+     * 메뉴 설명
+     */
+    @Column(name = "menu_description", length = 200)
+    private String description;
+
+    /**
      * 메뉴 추천 여부
      */
     @Column(name = "menu_recommend")
