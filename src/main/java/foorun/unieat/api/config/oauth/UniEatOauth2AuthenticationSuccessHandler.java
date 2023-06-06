@@ -17,11 +17,10 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class UniEatOauth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
 
         response.sendError(FooRunResponseCode.CODE_201.getHttpStatus().value(), FooRunResponseCode.CODE_201.getResponseMessage());
-        response.sendRedirect("/");
     }
 }

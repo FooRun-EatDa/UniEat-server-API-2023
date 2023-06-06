@@ -37,13 +37,14 @@ spring:
 
           naver:
             client-name: naver
+            client-authentication-method: POST
             authorization-grant-type: authorization_code
             client-id: ${NAVER_CLIENT_ID}
-            client-secret:
+            client-secret: ${NAVER_SECRET}
             redirect-uri: http://52.78.77.242:${server.port}/login/oauth2/code/naver
             scope:
               - gender
-              - age_range
+              - age
               - birthday
 
           kakao:

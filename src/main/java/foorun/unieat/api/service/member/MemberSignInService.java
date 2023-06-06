@@ -107,17 +107,26 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn>, O
             } break;
 
             case NAVER: {
-                /* TODO: naver 구현 필요 */
-                log.debug("naver attributeName: {}", userNameAttributeName);
-                log.debug("naver attributes: {}", attributes);
                 attributes = (Map) attributes.get(userNameAttributeName);
-                userNameAttributeName = "id";
 
-                username = String.valueOf(attributes.get(userNameAttributeName));
+                final String keyUserId = "id";
+                final String keyAgeRange = "age";
+                final String keyBirthday = "birthday";  // MM-DD
+                //final String keyBirthdayType = "birthday_type";   //양/음력 여부 없음
+                final String keyGneder = "gender";  // F: 여성, M: 남성, U: 확인불가
+
+                username = String.valueOf(attributes.get(keyUserId));
+
+                ageRange = attributes.get(keyAgeRange);
+                birthday = attributes.get(keyBirthday);
+                birthdayType = null;
+                gender = attributes.get(keyGneder);
             } break;
 
             case KAKAO: {
                 username = String.valueOf(attributes.get(userNameAttributeName));
+
+                userNameAttributeName = "kakao_account";
 
                 final String keyAgeRange = "age_range";
                 final String keyBirthday = "birthday";
@@ -125,11 +134,11 @@ public class MemberSignInService implements UniEatCommonService<MemberSignIn>, O
                 final String keyGneder = "gender";
 
                 // kakao 정책 데이터 가져오기
-                Map<String, Object> kakaoAttributes = (Map<String, Object>) attributes.get("kakao_account");
-                ageRange = kakaoAttributes.get(keyAgeRange);
-                birthday = kakaoAttributes.get(keyBirthday);
-                birthdayType = kakaoAttributes.get(keyBirthdayType);
-                gender = kakaoAttributes.get(keyGneder);
+                attributes = (Map) attributes.get(userNameAttributeName);
+                ageRange = attributes.get(keyAgeRange);
+                birthday = attributes.get(keyBirthday);
+                birthdayType = attributes.get(keyBirthdayType);
+                gender = attributes.get(keyGneder);
             } break;
 
             default:

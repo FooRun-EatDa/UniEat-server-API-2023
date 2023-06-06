@@ -33,6 +33,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class UniEatSecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
+
     private final MemberSignInService memberSignInService;
 
     private final UniEatMemberRepository memberRepository;
@@ -114,13 +115,16 @@ public class UniEatSecurityConfig {
             .oauth2Login()
             .clientRegistrationRepository(clientRegistrationRepository)
             .authorizedClientService(oAuth2AuthorizedClientService)
-            .authorizationEndpoint()                                /* 인가 요청      default: /oauth2/authorization/{registrationId} */
+            .authorizationEndpoint()                                    /* 인가 요청 */
+            .baseUri("/oauth2/authorization")    /* default: /oauth2/authorization/{registrationId} */
             .and()
-            .redirectionEndpoint()                                  /* 인가 코드 발급 default: /login/oauth2/code/{registrationId} */
+            .redirectionEndpoint()                                      /* 인가 코드 발급  */
+            .baseUri("/login/oauth2/code/**")   /* default: /login/oauth2/code/{registrationId} */
             .and()
-            .tokenEndpoint()                                        /* Access Token 발급 */
+            .tokenEndpoint()                                            /* Access Token 발급 */
+                //.accessTokenResponseClient()
             .and()
-            .userInfoEndpoint().userService(memberSignInService)    /* oauth2 login 성공 이후 설정 */
+            .userInfoEndpoint().userService(memberSignInService)        /* oauth2 login 성공 이후 설정 */
             .and()
             .successHandler(new UniEatOauth2AuthenticationSuccessHandler())
             .failureHandler(new UniEatOauth2AuthenticationFailureHandler())
