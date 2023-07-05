@@ -6,6 +6,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Deprecated
 public class RestaurantFileIdEntity implements JsonSerializable {
     private Long restaurant;
     private String file;

@@ -1,4 +1,4 @@
-package foorun.unieat.api.model.database.member.entity.clazz;
+package foorun.unieat.api.model.database.member.entity.primary_key;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 public class UniEatMemberId implements Serializable {
     private String provider;
     private String primaryId;

@@ -1,42 +1,71 @@
 package foorun.unieat.api.controller;
 
+import foorun.unieat.api.auth.JwtProvider;
 import foorun.unieat.api.model.domain.UniEatCommonResponse;
-import foorun.unieat.api.model.domain.member.request.MemberSignUp;
+import foorun.unieat.api.model.domain.member.request.MemberSignIn;
+import foorun.unieat.api.model.domain.member.request.MemberSignOut;
+import foorun.unieat.api.model.domain.member.request.OAuth2SignIn;
+import foorun.unieat.api.model.domain.member.response.OAuth2Token;
 import foorun.unieat.api.service.member.MemberSignInService;
-import foorun.unieat.api.service.member.MemberSignUpService;
+import foorun.unieat.api.service.member.MemberSignOutService;
+import foorun.unieat.common.exception.ResponseRuntimeException;
+import foorun.unieat.common.http.FooRunToken;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
 @RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
-    private final MemberSignUpService memberSignUpService;
     private final MemberSignInService memberSignInService;
+    private final MemberSignOutService memberSignOutService;
 
-    /*@RequestMapping(value = "/sign-in", method = RequestMethod.POST)
-    public ResponseEntity oAuthSignIn(@Validated @RequestBody OAuth2User form) {
-        log.debug("try sign in: {}", form);
-        ResponseEntity response = memberSignInService.service(form);
+    @RequestMapping(value = "/sign-in/{providerStr}", method = RequestMethod.POST)
+    public ResponseEntity signInOAuth(@PathVariable String providerStr, @Validated @RequestBody OAuth2SignIn form) {
+        MemberSignIn dto = MemberSignIn.of(providerStr, form.getAccessToken());
+        OAuth2Token result = memberSignInService.service(dto);
+        FooRunToken fooRunToken = result.getToken();
 
-        return response;
-    }*/
+        Map<String, String> body = new LinkedHashMap<>();
+        body.put(HttpHeaders.AUTHORIZATION, fooRunToken.getAccessToken());
+        body.put(JwtProvider.REFRESH_TOKEN_HEADER_NAME, fooRunToken.getRefreshToken());
 
-    /* OAUTH 구현하면서 다르게 처리 */
-    //@RequestMapping(value = "/sign-up", method = RequestMethod.POST)
-    @Deprecated
-    public ResponseEntity signUp(@Validated @RequestBody MemberSignUp form) {
-        log.debug("try sign up: {}", form);
-        ResponseEntity response = memberSignUpService.service(form);
+        return UniEatCommonResponse.success(body);
+    }
 
-        return response;
+    @RequestMapping(value = "/sign-out", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity signOut(@RequestHeader Map<String, String> headers) {
+        try {
+            MemberSignOut dto = MemberSignOut.of(headers.get(HttpHeaders.AUTHORIZATION.toLowerCase()), headers.get(JwtProvider.REFRESH_TOKEN_HEADER_NAME.toLowerCase()));
+            if (dto.getAccessToken() == null || dto.getAccessToken().trim().isEmpty()) {
+                throw new NullPointerException("Access Token is empty.");
+            }
+            if (dto.getRefreshToken() == null || dto.getRefreshToken().trim().isEmpty()) {
+                throw new NullPointerException("Refresh Token is empty.");
+            }
+
+            memberSignOutService.service(dto);
+        } catch (ResponseRuntimeException e) {
+            log.error(e.getMessage());
+        } catch (Exception e) {
+            log.error("비정상적인 요청이 감지되었습니다. ({})", e.getMessage());
+        }
+
+        return UniEatCommonResponse.success();
     }
 
     @GetMapping("/test")

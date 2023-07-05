@@ -8,6 +8,10 @@ group = 'foorun.unieat'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '8'
 
+jar {
+	archiveBaseName = 'unieat-api.jar'
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -60,7 +64,6 @@ dependencies {
     implementation "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
 
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	/* authorization library - jwt */
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 
@@ -78,24 +81,22 @@ dependencies {
 	/* database:java persistence api */
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'com.querydsl:querydsl-jpa:4.4.0'
-
 	annotationProcessor(
 			"javax.persistence:javax.persistence-api",
 			"javax.annotation:javax.annotation-api",
 			"com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
 	)
 
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
 	/* mariaDB jdbc library */
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	/* h2 database */
 	runtimeOnly 'com.h2database:h2'
 
-
-    /* jsch - ssh session */
-    implementation 'com.jcraft:jsch:0.1.55'
-
+	if ("local" == "${activeProfile}") {
+		println("import: jsch in local only.")
+		/* jsch - ssh session */
+		implementation 'com.jcraft:jsch:0.1.55'
+	}
 
 	/* annotation library */
 	compileOnly 'org.projectlombok:lombok'
@@ -105,13 +106,16 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.mockito:mockito-inline:3.4.0' //Mockito: static method mocking 위해 추가
+
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
 sourceSets {
 	main {
 		java {
 			srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
-			if ("${activeProfile}" != "local") {
+			if ("local" != "${activeProfile}") {
+				println("excluded: jsch")
 				exclude '**/exclude*'
 			}
 		}
@@ -119,7 +123,8 @@ sourceSets {
 }
 
 tasks.named('test') {
-	if ("${activeProfile}" != "local") {
+	if ("local" != "${activeProfile}") {
+		println("excluded: jsch")
 		exclude '**/exclude*'
 	}
 	useJUnitPlatform()

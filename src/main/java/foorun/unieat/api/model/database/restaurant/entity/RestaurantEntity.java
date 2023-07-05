@@ -1,115 +1,129 @@
 package foorun.unieat.api.model.database.restaurant.entity;
 
 import foorun.unieat.api.model.base.jpa.UniEatBaseTimeEntity;
-import foorun.unieat.api.model.database.food.entity.FoodEntity;
-import foorun.unieat.common.rules.StatusType;
-import lombok.*;
-import org.springframework.validation.annotation.Validated;
+import foorun.unieat.api.model.database.menu.entity.FoodMenuEntity;
+import foorun.unieat.common.rules.ManagedStatusType;
+import lombok.Getter;
+import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-@Getter
+/**
+ * 식당 기본정보
+ */
 @Entity
-@Builder
-@Validated
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Table(name = "restaurant")
+@Table(name = "restaurant_base")
+@Getter
 public class RestaurantEntity extends UniEatBaseTimeEntity {
-
     /**
      * 식당 ID
      */
     @Id
-    @Column(name = "restaurant_id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "restaurant_id", updatable = false)
+    private Long primaryId;
+
+    /**
+     * 사업자번호
+     */
+    @Column(name = "business_number", length = 10)
+    private String businessNumber;
 
     /**
      * 식당명
      */
-    @Column(name = "restaurant_name")
+    @Column(name = "restaurant_name", length = 200)
     private String name;
+
+    /**
+     * 식당 대표이미지 sequence
+     */
+    @ToString.Exclude
+    @Column(name = "restaurant_title_image_seq")
+    private Integer titleImageSeq;
 
     /**
      * 식당 한줄 소개
      */
-    @Column(name = "restaurant_introduction")
+    @Column(name = "restaurant_introduction", length = 100)
     private String introduction;
-
-    /**
-     * 식당 이미지
-     */
-    @Column(name = "img_url")
-    private String imgUrl;
 
     /**
      * 식당 상세 설명
      */
-    @Column(name = "restaurant_content")
+    @Column(name = "restaurant_content", length = 500)
     private String content;
 
     /**
-     * 식당 카테고리
+     * 식당 주소 기본
      */
-    @Column(name = "category_code")
-    private Integer category;
+    @Column(name = "restaurant_address_base", length = 100)
+    private String addressBase;
 
     /**
-     * 식당 주소
+     * 식당 주소 상세
      */
-    private String address;
+    @Column(name = "restaurant_address_detail", length = 100)
+    private String addressDetail;
 
     /**
-     * 식당 위치 (학생들이 부르는 지역 기준)
+     * 식당위치 위도
      */
-    private String district;
+    @Column(name = "restaurant_latitude", precision = 13, scale = 10)
+    private BigDecimal latitude;
 
     /**
-     * 경도
+     * 식당위치 경도
      */
-    private Double longitude;
-
-    /**
-     * 위도
-     */
-    private Double latitude;
+    @Column(name = "restaurant_longitude", precision = 13, scale = 10)
+    private BigDecimal longitude;
 
     /**
      * 식당 전화번호
      */
-    @Column(name = "phone_number")
-    private String phoneNunmber;
+    @Column(name = "restaurant_call_number", length = 11)
+    private String callNumber;
 
     /**
-     * 식당 운영시간
+     * 식당 운영시간 설명
      */
-    @Column(name = "operation_time")
+    @Column(name = "restaurant_operation_time", length = 300)
     private String operationTime;
 
     /**
-     * 식당 대표 음식가격
+     * 식당 상태 관리
      */
-    private int price;
-
-    /**
-     * 식당 상태값
-     */
-    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private StatusType status = StatusType.ACTIVE;
+    @Column(name = "manage_status", length = 10)
+    private ManagedStatusType status = ManagedStatusType.ACTIVE;
 
     @ToString.Exclude
-    @Builder.Default
-    @OneToMany
-    @JoinColumn(name="restaurant_id")
-    private Set<FoodEntity> foods = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id")
+    private Set<RestaurantFoodCategoryEntity> foodCategories = new HashSet<>();
 
     @ToString.Exclude
-    @Builder.Default
-    @OneToMany(mappedBy = "restaurant")
-    private Set<RestaurantFileEntity> files = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id")
+    private List<RestaurantImageEntity> restaurantImages = new ArrayList<>();
 
-    /* TODO: 식당의 행정적 위치 정보, 카테고리정보 포함 */
+    @ToString.Exclude
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurant_id")
+    private Set<FoodMenuEntity> foodMenu = new HashSet<>();
 }

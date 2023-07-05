@@ -1,6 +1,6 @@
 package foorun.unieat.api.model.domain.member.request;
 
-import foorun.unieat.api.model.base.dto.UniEatBaseDTO;
+import foorun.unieat.api.model.base.dto.UniEatRequestDTO;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.validation.annotation.Validated;
@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @Validated
-public class MemberSignUp implements UniEatBaseDTO {
+public class MemberSignUp implements UniEatRequestDTO {
     @NotBlank
     @Email(message = "E-Mail 양식이 아닙니다.")
     private String email;

@@ -6,9 +6,8 @@ import foorun.unieat.api.config.security.filter.UniEatJwtAuthentication;
 import foorun.unieat.api.config.security.handler.UniEatAccessDeniedHandler;
 import foorun.unieat.api.config.security.handler.UniEatAuthenticationEntryPoint;
 import foorun.unieat.api.config.oauth.UniEatOauth2AuthenticationSuccessHandler;
-import foorun.unieat.api.model.database.member.repository.UniEatMemberAuthRepository;
 import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
-import foorun.unieat.api.service.member.OAuth2DetailsService;
+import foorun.unieat.api.service.member.MemberSignInService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -28,18 +27,16 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Collections;
-
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class UniEatSecurityConfig {
     private final ClientRegistrationRepository clientRegistrationRepository;
     private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
-    private final OAuth2DetailsService oAuth2DetailsService;
+
+    private final MemberSignInService memberSignInService;
 
     private final UniEatMemberRepository memberRepository;
-    private final UniEatMemberAuthRepository authRepository;
     private final JwtProvider jwtProvider;
 
     /* Spring security Password Encoder */
@@ -106,27 +103,30 @@ public class UniEatSecurityConfig {
             .and()
 
             .authorizeHttpRequests()                                /* 요청에 대한 검사 처리 */
-            .antMatchers("/member/sign-*")     /* URL 패턴 */
+            .antMatchers("/member/sign-*", "/member/sign-*/*")     /* URL 패턴 */
             .permitAll()                                            /* 인가 */
             .anyRequest()
             .authenticated()
             .and()
 
             /* 회원 인증처리 전 Json Web Token 확인 및 재발급 여부 */
-            .addFilterBefore(new UniEatJwtAuthentication(jwtProvider, memberRepository, authRepository), UsernamePasswordAuthenticationFilter.class)
-
+            .addFilterBefore(new UniEatJwtAuthentication(jwtProvider, memberRepository), UsernamePasswordAuthenticationFilter.class)
+            /* OAuth2 WEB 인증 방식, 테스트용으로만 사용 */
             .oauth2Login()
             .clientRegistrationRepository(clientRegistrationRepository)
             .authorizedClientService(oAuth2AuthorizedClientService)
-            .authorizationEndpoint()                                /* 인가 요청      default: /oauth2/authorization/{registrationId} */
+            .authorizationEndpoint()                                    /* 인가 요청 */
+            .baseUri("/oauth2/authorization")    /* default: /oauth2/authorization/{registrationId} */
             .and()
-            .redirectionEndpoint()                                  /* 인가 코드 발급 default: /login/oauth2/code/{registrationId} */
+            .redirectionEndpoint()                                      /* 인가 코드 발급  */
+            .baseUri("/login/oauth2/code/**")   /* default: /login/oauth2/code/{registrationId} */
             .and()
-            .tokenEndpoint()                                        /* Access Token 발급 */
+            .tokenEndpoint()                                            /* Access Token 발급 */
+                //.accessTokenResponseClient()
             .and()
-            .userInfoEndpoint().userService(oAuth2DetailsService)   /* oauth2 login 성공 이후 설정 */
+            .userInfoEndpoint().userService(memberSignInService)        /* oauth2 login 성공 이후 설정 */
             .and()
-            .successHandler(new UniEatOauth2AuthenticationSuccessHandler(jwtProvider, memberRepository, authRepository))
+            .successHandler(new UniEatOauth2AuthenticationSuccessHandler())
             .failureHandler(new UniEatOauth2AuthenticationFailureHandler())
         ;
 

@@ -35,21 +35,25 @@ spring:
               #- age
               #- birthday
 
-          #naver:
-            #client-name: naver
-            #authorization-grant-type:
-            #client-id:
-            #client-secret:
-            #redirect-uri: http://localhost:${server.port}/login/oauth2/code/naver
-            #scope:
+          naver:
+            client-name: naver
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            client-id: ${NAVER_CLIENT_ID}
+            client-secret: ${NAVER_SECRET}
+            redirect-uri: http://52.78.77.242:${server.port}/login/oauth2/code/naver
+            scope:
+              - gender
+              - age
+              - birthday
 
           kakao:
             client-name: kakao
             client-authentication-method: POST
             authorization-grant-type: authorization_code
-            client-id: ${KAKAO_REST_API}
+            client-id: ${KAKAO_CLIENT_ID}
             #client-secret: ${KAKAO_SECRET}
-            redirect-uri: http://localhost:${server.port}/login/oauth2/code/kakao
+            redirect-uri: http://52.78.77.242:${server.port}/login/oauth2/code/kakao
             scope:
               - gender
               - age_range

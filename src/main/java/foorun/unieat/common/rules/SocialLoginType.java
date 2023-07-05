@@ -13,8 +13,4 @@ public enum SocialLoginType {
     KAKAO,
     NAVER,
     ;
-
-    public static SocialLoginType valueOfIgnoreCase(String str) {
-        return Arrays.stream(values()).filter(t -> t.name().toLowerCase().equals(str.toLowerCase())).findFirst().orElseThrow(UniEatServerErrorException::new);
-    }
 }

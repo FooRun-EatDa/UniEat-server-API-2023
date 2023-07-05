@@ -3,9 +3,8 @@ spring:
     include:
     - database
     - aws
-
-  pid:
-    file: .unieat-api.pid
+    - auth
+    - oauth2
 
   application:
     admin:

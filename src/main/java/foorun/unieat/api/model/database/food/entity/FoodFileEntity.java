@@ -19,6 +19,7 @@ import javax.persistence.*;
 @DynamicUpdate
 @IdClass(FoodFileIdEntity.class)
 @Table(name="food_file")
+@Deprecated
 public class FoodFileEntity extends BaseFileEntity implements JsonSerializable {
     @Id
     @ToString.Exclude

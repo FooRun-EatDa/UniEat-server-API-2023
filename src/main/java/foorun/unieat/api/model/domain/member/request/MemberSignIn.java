@@ -1,19 +1,16 @@
 package foorun.unieat.api.model.domain.member.request;
 
-import foorun.unieat.api.model.base.dto.UniEatBaseDTO;
+import foorun.unieat.api.model.base.dto.UniEatRequestDTO;
 import lombok.Data;
-import lombok.ToString;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-@Data
+@Data(staticConstructor = "of")
 @Validated
-public class MemberSignIn implements UniEatBaseDTO {
+public class MemberSignIn implements UniEatRequestDTO {
     @NotBlank
-    private String primaryId;
-
-    @ToString.Exclude
-    private String password;
+    private final String provider;
+    @NotBlank
+    private final String accessToken;
 }

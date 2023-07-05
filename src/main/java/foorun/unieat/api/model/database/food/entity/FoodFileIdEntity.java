@@ -13,6 +13,7 @@ import javax.persistence.Id;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Deprecated
 public class FoodFileIdEntity implements JsonSerializable {
     private Long food;    // pk
     private String file;  // pk
