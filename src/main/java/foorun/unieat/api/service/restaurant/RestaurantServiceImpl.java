@@ -1,20 +1,28 @@
 package foorun.unieat.api.service.restaurant;
 
 import foorun.unieat.api.model.database.restaurant.entity.RestaurantEntity;
+import foorun.unieat.api.model.database.restaurant.repository.RestaurantRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.List;
 
+@Slf4j
 @Service
-@Transactional
+@RequiredArgsConstructor
 public class RestaurantServiceImpl implements RestaurantService {
+    private final RestaurantRepository restaurantRepository;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Override
+    public List<RestaurantEntity> getRestaurantInArea(double latitude, double longitude, double distance) {
+        return restaurantRepository.inArea(latitude, longitude, distance);
+    }
 
+    public List<RestaurantEntity> getRestaurantByKeyword(String search) {
+        return restaurantRepository.searchKeyword(search);
+    }
+/*
     // 위도, 경도를 라디안 단위로 변환하는 메서드
     private double toRadians(double degree) {
         return degree * Math.PI / 180.0;
@@ -100,4 +108,6 @@ public class RestaurantServiceImpl implements RestaurantService {
         entityManager.persist(newRestaurant);
         return newRestaurant;
     }
+*/
+
 }

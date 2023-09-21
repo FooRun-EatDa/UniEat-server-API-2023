@@ -1,7 +1,15 @@
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.9'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+
+	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
 
 group = 'foorun.unieat'
@@ -16,6 +24,7 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+	querydsl.extendsFrom compileClasspath
 }
 
 repositories {
@@ -56,13 +65,9 @@ dependencies {
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.0'
     /* database:java persistence api */
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'com.querydsl:querydsl-jpa:4.4.0'
-
 
     implementation "javax.persistence:javax.persistence-api"
     implementation "javax.annotation:javax.annotation-api"
-    implementation "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
-
 
 	/* authorization library - jwt */
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
@@ -80,12 +85,8 @@ dependencies {
 	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.3.0'
 	/* database:java persistence api */
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'com.querydsl:querydsl-jpa:4.4.0'
-	annotationProcessor(
-			"javax.persistence:javax.persistence-api",
-			"javax.annotation:javax.annotation-api",
-			"com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
-	)
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 	/* mariaDB jdbc library */
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
@@ -110,10 +111,17 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
 
+def querydslDir = "$buildDir/generated/querydsl"
+
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+
 sourceSets {
 	main {
 		java {
-			srcDirs = ["$projectDir/src/main/java", "$projectDir/build/generated"]
+			srcDirs = ["$projectDir/src/main/java", querydslDir]
 			if ("local" != "${activeProfile}") {
 				println("excluded: jsch")
 				exclude '**/exclude*'
@@ -122,16 +130,35 @@ sourceSets {
 	}
 }
 
+task deleteGeneratedSources(type: Delete) {
+	delete file(querydslDir)
+}
+
+tasks.withType(JavaCompile) { it.dependsOn('deleteGeneratedSources') }
+
+task initSourceFolders {
+	sourceSets*.java.srcDirs*.each {
+		if ( !it.exists() ) {
+			it.mkdirs()
+		}
+	}
+	sourceSets*.resources.srcDirs*.each {
+		if ( !it.exists() ) {
+			it.mkdirs()
+		}
+	}
+}
+
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
+}
+
 tasks.named('test') {
 	if ("local" != "${activeProfile}") {
 		println("excluded: jsch")
 		exclude '**/exclude*'
 	}
 	useJUnitPlatform()
-}
-
-clean {
-	delete file('src/main/generated') // QueryDsl 생성파일 제거
 }
 
 bootRun {
