@@ -1,5 +1,7 @@
 package foorun.unieat.api.service.restaurant;
 
+import foorun.unieat.api.model.database.menu.entity.FoodMenuEntity;
+import foorun.unieat.api.model.database.menu.repository.FoodMenuRepository;
 import foorun.unieat.api.model.database.restaurant.entity.RestaurantEntity;
 import foorun.unieat.api.model.database.restaurant.repository.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RestaurantServiceImpl implements RestaurantService {
     private final RestaurantRepository restaurantRepository;
+    private final FoodMenuRepository foodMenuRepository;
 
     @Override
     public List<RestaurantEntity> getRestaurantInArea(double latitude, double longitude, double distance) {
@@ -22,7 +25,13 @@ public class RestaurantServiceImpl implements RestaurantService {
     public List<RestaurantEntity> getRestaurantByKeyword(String search) {
         return restaurantRepository.searchKeyword(search);
     }
-/*
+
+    @Override
+    public List<FoodMenuEntity> getMenuByRestaurantId(Long restaurantId) {
+        return foodMenuRepository.findByRestaurantId(restaurantId);
+    }
+
+    /*
     // 위도, 경도를 라디안 단위로 변환하는 메서드
     private double toRadians(double degree) {
         return degree * Math.PI / 180.0;

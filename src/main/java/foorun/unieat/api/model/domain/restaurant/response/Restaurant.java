@@ -1,5 +1,6 @@
 package foorun.unieat.api.model.domain.restaurant.response;
 
+import foorun.unieat.api.model.base.dto.UniEatResponseDTO;
 import foorun.unieat.api.model.database.restaurant.entity.RestaurantEntity;
 import foorun.unieat.common.rules.ManagedStatusType;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
-public class Restaurant {
+public class Restaurant implements UniEatResponseDTO {
     /**
      * 식당 ID
      */
