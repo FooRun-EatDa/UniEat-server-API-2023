@@ -1,9 +1,10 @@
-package foorun.unieat.api.service.restaurant;
+package foorun.unieat.api.service.restaurant.impl;
 
 import foorun.unieat.api.model.database.menu.entity.FoodMenuEntity;
 import foorun.unieat.api.model.database.menu.repository.FoodMenuRepository;
 import foorun.unieat.api.model.database.restaurant.entity.RestaurantEntity;
 import foorun.unieat.api.model.database.restaurant.repository.RestaurantRepository;
+import foorun.unieat.api.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,14 @@ public class RestaurantServiceImpl implements RestaurantService {
         return restaurantRepository.inArea(latitude, longitude, distance);
     }
 
+    @Override
     public List<RestaurantEntity> getRestaurantByKeyword(String search) {
         return restaurantRepository.searchKeyword(search);
+    }
+
+    @Override
+    public List<RestaurantEntity> getRestaurantByBookMark(String provider, String memberId) {
+        return restaurantRepository.bookmark(provider, memberId);
     }
 
     @Override

@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 import static foorun.unieat.api.model.database.restaurant.entity.QRestaurantEntity.restaurantEntity;
+import static foorun.unieat.api.model.database.member.entity.QUnieatMemberBookMarkEntity.unieatMemberBookMarkEntity;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -34,6 +35,18 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<RestaurantEntity> resultList = jpaQueryFactory.selectFrom(restaurantEntity)
                 .where(
                         restaurantEntity.name.contains(search)
+                ).fetch();
+
+        return resultList;
+    }
+
+    @Override
+    public List<RestaurantEntity> bookmark(String provider, String memberId) {
+        List<RestaurantEntity> resultList = jpaQueryFactory.select(restaurantEntity)
+                .from(unieatMemberBookMarkEntity, restaurantEntity)
+                .where(unieatMemberBookMarkEntity.provider.eq(provider),
+                        unieatMemberBookMarkEntity.primaryId.eq(memberId),
+                        unieatMemberBookMarkEntity.restaurantId.eq(restaurantEntity.primaryId)
                 ).fetch();
 
         return resultList;

@@ -1,6 +1,11 @@
 package foorun.unieat.api.controller;
 
 import foorun.unieat.api.auth.JwtProvider;
+import foorun.unieat.api.exception.UniEatServerErrorException;
+import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
+import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
+import foorun.unieat.api.model.database.restaurant.entity.RestaurantEntity;
+import foorun.unieat.api.model.database.restaurant.repository.RestaurantRepository;
 import foorun.unieat.api.model.domain.UniEatCommonResponse;
 import foorun.unieat.api.model.domain.member.request.MemberSignIn;
 import foorun.unieat.api.model.domain.member.request.MemberSignOut;
@@ -15,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -65,12 +69,6 @@ public class MemberController {
             log.error("비정상적인 요청이 감지되었습니다. ({})", e.getMessage());
         }
 
-        return UniEatCommonResponse.success();
-    }
-
-    @GetMapping("/test")
-    public ResponseEntity testCase() {
-        log.debug("CALL");
         return UniEatCommonResponse.success();
     }
 }

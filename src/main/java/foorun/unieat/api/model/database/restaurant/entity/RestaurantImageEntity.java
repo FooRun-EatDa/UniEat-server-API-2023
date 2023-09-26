@@ -25,6 +25,7 @@ public class RestaurantImageEntity extends UniEatBaseTimeEntity {
     /**
      * 이미지 순서
      */
+    @Id
     @Column(name = "seq")
     private Integer sequence;
 

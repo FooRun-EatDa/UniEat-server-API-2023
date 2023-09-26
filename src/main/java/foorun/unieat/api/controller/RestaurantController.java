@@ -1,20 +1,27 @@
 package foorun.unieat.api.controller;
 
+import foorun.unieat.api.auth.JwtProvider;
 import foorun.unieat.api.exception.UniEatServerErrorException;
+import foorun.unieat.api.model.database.member.entity.UniEatMemberEntity;
+import foorun.unieat.api.model.database.member.repository.UniEatMemberRepository;
 import foorun.unieat.api.model.database.menu.entity.FoodMenuEntity;
 import foorun.unieat.api.model.database.restaurant.entity.RestaurantEntity;
+import foorun.unieat.api.model.domain.UniEatCommonResponse;
 import foorun.unieat.api.model.domain.member.request.MemberLocation;
 import foorun.unieat.api.model.domain.menu.response.FoodMenu;
 import foorun.unieat.api.model.domain.restaurant.response.Restaurant;
 import foorun.unieat.api.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +33,10 @@ import java.util.stream.Collectors;
 public class RestaurantController {
     private final RestaurantService restaurantService;
 
+    private final JwtProvider jwtProvider;
+    private final UniEatMemberRepository uniEatMemberRepository;
+
+    @Transactional
     @GetMapping(value = "/location")
     public ResponseEntity getRestaurantList(MemberLocation location) {
         try {
@@ -34,13 +45,14 @@ public class RestaurantController {
 
             List<Restaurant> responseData = resultList.stream().map(entity -> Restaurant.of(entity)).collect(Collectors.toList());
 
-            return ResponseEntity.ok(responseData);
+            return UniEatCommonResponse.success(responseData);
         } catch (Exception e) {
             e.printStackTrace();
             throw new UniEatServerErrorException();
         }
     }
 
+    @Transactional
     @GetMapping(value = "/keyword")
     public ResponseEntity getRestaurantList(String search) {
         try {
@@ -49,7 +61,26 @@ public class RestaurantController {
 
             List<Restaurant> responseData = resultList.stream().map(entity -> Restaurant.of(entity)).collect(Collectors.toList());
 
-            return ResponseEntity.ok(responseData);
+            return UniEatCommonResponse.success(responseData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new UniEatServerErrorException();
+        }
+    }
+
+    @Transactional
+    @GetMapping("/bookmark")
+    public ResponseEntity getBookMark(HttpServletRequest request) {
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        UniEatMemberEntity member = jwtProvider.resolveToken(token, uniEatMemberRepository);
+
+        try {
+            List<RestaurantEntity> resultList = restaurantService.getRestaurantByBookMark(member.getProvider(), member.getPrimaryId());
+            if (resultList == null) resultList = new ArrayList<>();
+
+            List<Restaurant> responseData = resultList.stream().map(entity -> Restaurant.of(entity)).collect(Collectors.toList());
+
+            return UniEatCommonResponse.success(responseData);
         } catch (Exception e) {
             e.printStackTrace();
             throw new UniEatServerErrorException();
@@ -64,7 +95,7 @@ public class RestaurantController {
 
             List<FoodMenu> responseData = resultList.stream().map(entity -> FoodMenu.of(entity)).collect(Collectors.toList());
 
-            return ResponseEntity.ok(responseData);
+            return UniEatCommonResponse.success(responseData);
         } catch (Exception e) {
             e.printStackTrace();
             throw new UniEatServerErrorException();
