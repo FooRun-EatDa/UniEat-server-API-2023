@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class MemberLocation implements UniEatRequestDTO {
-    private float longitude;
-    private float latitude;
+    private Double latitude;
+    private Double longitude;
 }

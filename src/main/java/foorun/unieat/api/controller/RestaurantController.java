@@ -1,25 +1,76 @@
 package foorun.unieat.api.controller;
 
+import foorun.unieat.api.exception.UniEatServerErrorException;
+import foorun.unieat.api.model.database.menu.entity.FoodMenuEntity;
 import foorun.unieat.api.model.database.restaurant.entity.RestaurantEntity;
+import foorun.unieat.api.model.domain.member.request.MemberLocation;
+import foorun.unieat.api.model.domain.menu.response.FoodMenu;
+import foorun.unieat.api.model.domain.restaurant.response.Restaurant;
 import foorun.unieat.api.service.restaurant.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigInteger;
-import java.sql.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
 @RequestMapping("/restaurant")
 @RequiredArgsConstructor
 public class RestaurantController {
+    private final RestaurantService restaurantService;
 
-    @Autowired
-    private RestaurantService restaurantService;
+    @GetMapping(value = "/location")
+    public ResponseEntity getRestaurantList(MemberLocation location) {
+        try {
+            List<RestaurantEntity> resultList = restaurantService.getRestaurantInArea(location.getLatitude(), location.getLongitude(), 30.0);
+            if (resultList == null) resultList = new ArrayList<>();
+
+            List<Restaurant> responseData = resultList.stream().map(entity -> Restaurant.of(entity)).collect(Collectors.toList());
+
+            return ResponseEntity.ok(responseData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new UniEatServerErrorException();
+        }
+    }
+
+    @GetMapping(value = "/keyword")
+    public ResponseEntity getRestaurantList(String search) {
+        try {
+            List<RestaurantEntity> resultList = restaurantService.getRestaurantByKeyword(search);
+            if (resultList == null) resultList = new ArrayList<>();
+
+            List<Restaurant> responseData = resultList.stream().map(entity -> Restaurant.of(entity)).collect(Collectors.toList());
+
+            return ResponseEntity.ok(responseData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new UniEatServerErrorException();
+        }
+    }
+
+    @GetMapping(value = "/menu/{restaurantId}")
+    public ResponseEntity getMenu(@PathVariable Long restaurantId) {
+        try {
+            List<FoodMenuEntity> resultList = restaurantService.getMenuByRestaurantId(restaurantId);
+            if (resultList == null) resultList = new ArrayList<>();
+
+            List<FoodMenu> responseData = resultList.stream().map(entity -> FoodMenu.of(entity)).collect(Collectors.toList());
+
+            return ResponseEntity.ok(responseData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new UniEatServerErrorException();
+        }
+    }
+/*
 
     // 주변 식장 좌표를 뿌려주는 메소드
     @GetMapping("/getCoordinate")
@@ -96,5 +147,5 @@ public class RestaurantController {
 
         return result;
     }
-
+*/
 }
