@@ -6,8 +6,11 @@ import foorun.unieat.common.rules.ManagedStatusType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor(staticName = "of")
@@ -32,6 +35,11 @@ public class Restaurant implements UniEatResponseDTO {
      * 식당 대표이미지 sequence
      */
     private Integer restaurant_title_image_seq;
+
+    /**
+     * 식당 이미지 목록
+     */
+    private List<RestaurantImage> restaurant_images;
 
     /**
      * 식당 한줄 소개
@@ -83,6 +91,7 @@ public class Restaurant implements UniEatResponseDTO {
                 entity.getBusinessNumber(),
                 entity.getName(),
                 entity.getTitleImageSeq(),
+                entity.getRestaurantImages().stream().map(e -> RestaurantImage.of(e)).collect(Collectors.toList()),
                 entity.getIntroduction(),
                 entity.getContent(),
                 entity.getAddressBase(),

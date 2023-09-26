@@ -114,12 +114,12 @@ public class RestaurantEntity extends UniEatBaseTimeEntity {
 
     @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurant_id")
     private Set<RestaurantFoodCategoryEntity> foodCategories = new HashSet<>();
 
     @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurant_id")
     private List<RestaurantImageEntity> restaurantImages = new ArrayList<>();
 
     @ToString.Exclude

@@ -7,4 +7,5 @@ import java.util.List;
 public interface RestaurantRepositoryCustom {
     List<RestaurantEntity> inArea(Double latitude, Double longitude, Double distance);
     List<RestaurantEntity> searchKeyword(String search);
+    List<RestaurantEntity> bookmark(String provider, String memberId);
 }
