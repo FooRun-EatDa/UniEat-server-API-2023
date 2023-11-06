@@ -24,11 +24,13 @@ import javax.persistence.Id;
 import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * UNIEAT 회원정보
@@ -110,6 +112,13 @@ public class UniEatMemberEntity extends UniEatUserDetails {
             @JoinColumn(name = "member_id", referencedColumnName = "member_id")
     })
     private UniEatMemberMyPageEntity myPage;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumns({
+            @JoinColumn(name = "member_provider", referencedColumnName = "member_provider"),
+            @JoinColumn(name = "member_id", referencedColumnName = "member_id")
+    })
+    private List<UnieatMemberBookMarkEntity> bookMark;
 
     /**
      * 최종 로그인 일시 갱신

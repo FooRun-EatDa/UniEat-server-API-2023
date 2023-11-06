@@ -19,7 +19,7 @@ public class FoodCategoryEntity extends UniEatBaseEntity {
      * 분류 ID
      */
     @Id
-    @Column(name = "category_id", length = 3)
+    @Column(name = "category_id", length = 3, updatable = false)
     private String primaryId;
 
     /**

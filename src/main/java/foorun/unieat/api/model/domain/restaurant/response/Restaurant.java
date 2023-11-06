@@ -6,9 +6,9 @@ import foorun.unieat.common.rules.ManagedStatusType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,6 +82,11 @@ public class Restaurant implements UniEatResponseDTO {
     private String restaurant_operation_time;
 
     /**
+     * 식당 Hash Tag
+     */
+    private Collection<String> restaurant_hashtags;
+
+    /**
      * 식당 상태 관리
      */
     private ManagedStatusType manage_status;
@@ -100,6 +105,7 @@ public class Restaurant implements UniEatResponseDTO {
                 entity.getLongitude(),
                 entity.getCallNumber(),
                 entity.getOperationTime(),
+                entity.getFoodCategories().stream().map(e -> e.getFoodCategory().getName()).collect(Collectors.toList()),
                 entity.getStatus()
                 );
     }

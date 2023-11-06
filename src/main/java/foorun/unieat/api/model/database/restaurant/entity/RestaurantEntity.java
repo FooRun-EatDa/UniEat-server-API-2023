@@ -19,9 +19,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * 식당 기본정보
@@ -115,15 +114,15 @@ public class RestaurantEntity extends UniEatBaseTimeEntity {
     @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurant_id")
-    private Set<RestaurantFoodCategoryEntity> foodCategories = new HashSet<>();
+    private Collection<RestaurantFoodCategoryEntity> foodCategories = new HashSet<>();
 
     @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurant_id")
-    private List<RestaurantImageEntity> restaurantImages = new ArrayList<>();
+    private Collection<RestaurantImageEntity> restaurantImages = new ArrayList<>();
 
     @ToString.Exclude
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", referencedColumnName = "restaurant_id")
-    private Set<FoodMenuEntity> foodMenu = new HashSet<>();
+    private Collection<FoodMenuEntity> foodMenu = new HashSet<>();
 }
